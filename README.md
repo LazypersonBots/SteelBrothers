@@ -25,7 +25,7 @@ and photographs into dist/. No separate database, external image host or
 public upload form is required.
 
 * Homepage: three newest photos in the gallery section.
-* If more than three photos exist, **Zobrazit více fotografií** opens /gallery/.
+* The **Zobrazit více fotografií** button always opens /gallery/, even if no photos have been added yet.
 * /gallery/ displays every photo and includes a prominent back-to-home link.
 * Zero photos: both pages show a truthful empty message instead of stock images.
 * Photos open in a new tab at their original resolution.
