@@ -6,7 +6,7 @@ Production domain: https://steelbrothers.cz/
 
 The site is plain HTML/CSS with no framework or build dependencies. Run `node preview.mjs` and open http://127.0.0.1:4173 for a local preview.
 
-The repository is ready for the real Steel Brothers logo/icon asset. Until that image is supplied, the existing SB fallback favicon/mark stays in place so production does not reference a missing file.
+The official circular Steel Brothers logo is included as `steel-brothers-logo.avif` with a transparent outside area and is displayed in the header and hero. The lightweight SB favicon fallback remains in place until a dedicated favicon is prepared.
 
 ## Search visibility
 
