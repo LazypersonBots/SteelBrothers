@@ -1,13 +1,62 @@
 import http from 'node:http';
-import {readFile} from 'node:fs/promises';
-const files = new Map([['/', ['index.html', 'text/html; charset=utf-8']], ['/index.html', ['index.html', 'text/html; charset=utf-8']], ['/styles.css', ['styles.css', 'text/css; charset=utf-8']], ['/steel-brothers-logo.avif', ['steel-brothers-logo.avif', 'image/avif']]]);
+import { readFile } from 'node:fs/promises';
+import { extname, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { buildGallery } from './scripts/build-gallery.mjs';
+
+await buildGallery();
+
+const output = resolve(fileURLToPath(new URL('./dist/', import.meta.url)));
+const routes = new Map([
+  ['/', 'index.html'],
+  ['/index.html', 'index.html'],
+  ['/gallery', 'gallery/index.html'],
+  ['/gallery/', 'gallery/index.html'],
+  ['/gallery/index.html', 'gallery/index.html'],
+  ['/gallery-data.json', 'gallery-data.json'],
+  ['/gallery.js', 'gallery.js'],
+  ['/styles.css', 'styles.css'],
+  ['/steel-brothers-logo.avif', 'steel-brothers-logo.avif']
+]);
+const mime = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png',
+  '.webp': 'image/webp', '.avif': 'image/avif', '.gif': 'image/gif'
+};
+
 http.createServer(async (req, res) => {
   res.setHeader('X-Robots-Tag', 'noindex, nofollow, noimageindex');
-  const route = files.get(new URL(req.url, 'http://localhost').pathname);
-  if (!route) { res.writeHead(404); res.end('Not found'); return; }
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    res.writeHead(405); res.end('Method not allowed'); return;
+  }
+  let pathname;
   try {
-    const body = await readFile(new URL(route[0], import.meta.url));
-    res.writeHead(200, {'Content-Type': route[1], 'Cache-Control': 'no-cache'});
-    res.end(body);
-  } catch { res.writeHead(500); res.end('Preview unavailable'); }
-}).listen(4173, '127.0.0.1', () => console.log('Local preview: http://127.0.0.1:4173'));
+    pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+  } catch {
+    res.writeHead(400); res.end('Invalid URL'); return;
+  }
+  const file = routes.get(pathname) ||
+    (pathname.startsWith('/photos/') && mime[extname(pathname).toLowerCase()]
+      ? pathname.slice(1) : null);
+  if (!file) { res.writeHead(404); res.end('Not found'); return; }
+  const target = resolve(output, file);
+  const within = relative(output, target);
+  if (within.startsWith('..') || within.startsWith('/') || within === '') {
+    res.writeHead(403); res.end('Forbidden'); return;
+  }
+  try {
+    const body = await readFile(target);
+    res.writeHead(200, {
+      'Content-Type': mime[extname(file).toLowerCase()] || 'application/octet-stream',
+      'Cache-Control': 'no-cache'
+    });
+    res.end(req.method === 'HEAD' ? undefined : body);
+  } catch {
+    res.writeHead(404); res.end('Not found');
+  }
+}).listen(4173, '127.0.0.1', () =>
+  console.log('Local preview: http://127.0.0.1:4173')
+);

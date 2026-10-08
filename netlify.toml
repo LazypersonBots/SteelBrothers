@@ -1,0 +1,8 @@
+[build]
+  command = "node --test && node scripts/build-gallery.mjs"
+  publish = "dist"
+
+[[redirects]]
+  from = "/gallery"
+  to = "/gallery/"
+  status = 301

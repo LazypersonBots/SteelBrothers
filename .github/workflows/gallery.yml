@@ -1,0 +1,27 @@
+name: Verify Steel Brothers gallery
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  gallery:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Test photo ordering, homepage limit and gallery navigation
+        run: node --test
+      - name: Build static site
+        run: node scripts/build-gallery.mjs
+      - name: Verify build output
+        run: |
+          test -s dist/gallery-data.json
+          test -s dist/gallery/index.html
+          test -s dist/index.html
+          test -s dist/gallery.js
+          test -s dist/steel-brothers-logo.avif
+          node -e "const p=require('./dist/gallery-data.json');if(!Array.isArray(p.photos))process.exit(1)"
