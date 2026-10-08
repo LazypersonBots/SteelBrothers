@@ -1,10 +1,11 @@
-import { cp, mkdir, readdir, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { basename, dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readPhotoZip } from './read-photo-zip.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const supported = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif']);
-const datePrefix = /^(\d{4})-(\d{2})-(\d{2})(?:-(\d{4}))?(?:[-_]|$)/;
+const datePrefix = /^(\d{4})-(\d{2})-(\d{2})(?:-(\d{2})(\d{2})(\d{2})?)?(?:[-_]|$)/;
 
 export function photoRecord(relativePath) {
   const file = basename(relativePath);
@@ -17,11 +18,11 @@ export function photoRecord(relativePath) {
     const year = Number(match[1]);
     const month = Number(match[2]);
     const day = Number(match[3]);
-    const clock = match[4] || '0000';
-    const hours = Number(clock.slice(0, 2));
-    const minutes = Number(clock.slice(2, 4));
-    const candidate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
-    if (year >= 1900 && hours < 24 && minutes < 60 &&
+    const hours = Number(match[4] || '0');
+    const minutes = Number(match[5] || '0');
+    const seconds = Number(match[6] || '0');
+    const candidate = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
+    if (year >= 1900 && hours < 24 && minutes < 60 && seconds < 60 &&
         candidate.getUTCFullYear() === year &&
         candidate.getUTCMonth() === month - 1 &&
         candidate.getUTCDate() === day) {
@@ -49,7 +50,7 @@ export function makeManifest(relativePaths) {
     .map(({ src, title, date }) => ({ src, title, date }));
 }
 
-async function collectImages(directory, prefix = '') {
+async function collectImages(directory, prefix = '', extensions = supported) {
   const results = [];
   let entries;
   try {
@@ -62,8 +63,8 @@ async function collectImages(directory, prefix = '') {
     const rel = prefix ? prefix + '/' + entry.name : entry.name;
     const full = join(directory, entry.name);
     if (entry.isDirectory()) {
-      results.push(...await collectImages(full, rel));
-    } else if (entry.isFile() && supported.has(extname(entry.name).toLowerCase())) {
+      results.push(...await collectImages(full, rel, extensions));
+    } else if (entry.isFile() && extensions.has(extname(entry.name).toLowerCase())) {
       results.push(rel);
     }
   }
@@ -73,7 +74,8 @@ async function collectImages(directory, prefix = '') {
 export async function buildGallery() {
   const output = join(root, 'dist');
   const images = await collectImages(join(root, 'photos'));
-  const manifest = makeManifest(images);
+  const archives = await collectImages(join(root, 'photos'), '', new Set(['.zip']));
+  const allPhotos = [...images];
   await rm(output, { recursive: true, force: true });
   await mkdir(join(output, 'gallery'), { recursive: true });
   await mkdir(join(output, 'photos'), { recursive: true });
@@ -88,6 +90,17 @@ export async function buildGallery() {
     await mkdir(dirname(destination), { recursive: true });
     await cp(join(root, 'photos', image), destination);
   }
+  for (const archive of archives) {
+    const entries = readPhotoZip(await readFile(join(root, 'photos', archive)), archive);
+    for (const photo of entries) {
+      if (allPhotos.includes(photo.filename)) {
+        throw new Error('Duplicate gallery photo filename: ' + photo.filename);
+      }
+      allPhotos.push(photo.filename);
+      await writeFile(join(output, 'photos', photo.filename), photo.data);
+    }
+  }
+  const manifest = makeManifest(allPhotos);
   await writeFile(join(output, 'gallery-data.json'),
     JSON.stringify({ photos: manifest }, null, 2) + '\n');
   console.log('Gallery build complete: ' + manifest.length + ' photo(s)');

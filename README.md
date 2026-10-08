@@ -17,7 +17,8 @@ examples are in [photos/README.md](photos/README.md).
 filename determines which photos are newest; Git filesystem modification dates
 are not reliable indicators of upload order. Undated photos appear last.
 
-Supported formats: JPG, JPEG, PNG, WebP, AVIF, GIF.
+Supported formats: JPG, JPEG, PNG, WebP, AVIF, GIF. You can also upload one
+ZIP of photos directly into photos/ — the build safely extracts the pictures.
 
 During every Netlify build, scripts/build-gallery.mjs finds all images in photos/,
 sorts them newest-first, generates dist/gallery-data.json and copies the site
@@ -25,7 +26,7 @@ and photographs into dist/. No separate database, external image host or
 public upload form is required.
 
 * Homepage: three newest photos in the gallery section.
-* If more than three photos exist, **Zobrazit více fotografií** opens /gallery/.
+* The **Zobrazit více fotografií** button always opens /gallery/, even if no photos have been added yet.
 * /gallery/ displays every photo and includes a prominent back-to-home link.
 * Zero photos: both pages show a truthful empty message instead of stock images.
 * Photos open in a new tab at their original resolution.
