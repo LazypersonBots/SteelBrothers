@@ -41,7 +41,7 @@ optimize their size, and commit them to the repository on request.
 
 Requires Node.js 18+:
 
-- Run tests: node --test tests/gallery.test.mjs
+- Run tests: node --test
 - Build: node scripts/build-gallery.mjs
 - Preview: node preview.mjs, then open http://127.0.0.1:4173/
 - Gallery preview: http://127.0.0.1:4173/gallery/
