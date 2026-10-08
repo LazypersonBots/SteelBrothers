@@ -16,6 +16,7 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23151514'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='30' fill='%23f46b35'%3ESB%3C/text%3E%3C/svg%3E">
   <link rel="preload" as="image" href="steel-brothers-logo.avif" type="image/avif">
   <link rel="stylesheet" href="styles.css">
+  <script src="/gallery.js" defer></script>
 </head>
 <body>
   <header class="header">
@@ -56,10 +57,11 @@
 
     <section class="section gallery" id="gallery" aria-labelledby="gallery-title">
       <div class="section-top"><div><p class="eyebrow accent"> / ZE SILNICE</p><h2 id="gallery-title">TOHLE SI CHCEME PAMATOVAT.</h2></div><p class="muted">Motor utichne.<br>Zážitky zůstávají.</p></div>
-      <div class="photo-grid">
-        <figure class="wide"><div class="photo-slot gallery-slot" role="img" aria-label="Prázdné místo pro fotografii společné vyjížďky"><span class="slot-corner">SPOLEČNĚ</span><div class="slot-center"><span>GALERIE SE PŘIPRAVUJE</span></div></div><figcaption>NAŠE CESTY</figcaption></figure>
-        <figure><div class="photo-slot gallery-slot" role="img" aria-label="Prázdné místo pro fotografii motocyklů"><span class="slot-corner">STROJE</span><div class="slot-center"><span>GALERIE SE PŘIPRAVUJE</span></div></div><figcaption>NAŠE MOTORKY</figcaption></figure>
-        <figure><div class="photo-slot gallery-slot" role="img" aria-label="Prázdné místo pro fotografii členů klubu"><span class="slot-corner">PARTA</span><div class="slot-center"><span>GALERIE SE PŘIPRAVUJE</span></div></div><figcaption>NAŠE CHVÍLE</figcaption></figure>
+      <div class="photo-grid" data-gallery-grid="home" aria-live="polite">
+        <p class="gallery-empty">Načítání fotografií…</p>
+      </div>
+      <div class="gallery-actions">
+        <a id="gallery-see-more" class="gallery-more-link" href="/gallery/" hidden>ZOBRAZIT VÍCE FOTOGRAFIÍ <span aria-hidden="true">→</span></a>
       </div>
     </section>
 
