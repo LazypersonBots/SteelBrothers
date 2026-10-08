@@ -36,6 +36,16 @@ test('invalid dates are not treated as recent', () => {
   assert.equal(items[1].date, null);
 });
 
+test('photos with same minute are ordered by exact seconds', () => {
+  const photos = makeManifest([
+    '2026-10-04-170022-motorky.jpg',
+    '2026-10-04-204027-fialova-motorka.jpg',
+    '2026-10-04-170023-skupina.jpg'
+  ]);
+  assert.deepEqual(photos.map((p) => p.title),
+    ['fialova motorka', 'skupina', 'motorky']);
+});
+
 test('only supported image extensions become gallery entries', () => {
   const items = makeManifest(['x.svg', 'code.js', 'photos/2026-10-08-picture.gif', 'x.webp']);
   assert.equal(items.length, 2);
