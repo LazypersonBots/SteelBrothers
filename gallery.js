@@ -11,7 +11,6 @@
     text.className = 'gallery-empty';
     text.textContent = message;
     grid.append(text);
-    if (more) more.hidden = true;
   }
 
   function makeCard(photo, index) {
@@ -66,7 +65,6 @@
 
       const visible = isHome ? photos.slice(0, 3) : photos;
       grid.replaceChildren(...visible.map(makeCard));
-      if (more) more.hidden = photos.length <= 3;
     } catch (error) {
       console.error('Steel Brothers gallery:', error);
       showMessage('Galerii se nepodařilo načíst. Zkuste stránku obnovit.');
