@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const supported = new Set(['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif']);
-const datePrefix = /^(\d{4})-(\d{2})-(\d{2})(?:-(\d{4}))?(?:[-_]|$)/;
+const datePrefix = /^(\d{4})-(\d{2})-(\d{2})(?:-(\d{2})(\d{2})(\d{2})?)?(?:[-_]|$)/;
 
 export function photoRecord(relativePath) {
   const file = basename(relativePath);
@@ -17,11 +17,11 @@ export function photoRecord(relativePath) {
     const year = Number(match[1]);
     const month = Number(match[2]);
     const day = Number(match[3]);
-    const clock = match[4] || '0000';
-    const hours = Number(clock.slice(0, 2));
-    const minutes = Number(clock.slice(2, 4));
-    const candidate = new Date(Date.UTC(year, month - 1, day, hours, minutes));
-    if (year >= 1900 && hours < 24 && minutes < 60 &&
+    const hours = Number(match[4] || '0');
+    const minutes = Number(match[5] || '0');
+    const seconds = Number(match[6] || '0');
+    const candidate = new Date(Date.UTC(year, month - 1, day, hours, minutes, seconds));
+    if (year >= 1900 && hours < 24 && minutes < 60 && seconds < 60 &&
         candidate.getUTCFullYear() === year &&
         candidate.getUTCMonth() === month - 1 &&
         candidate.getUTCDate() === day) {
