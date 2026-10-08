@@ -21,7 +21,7 @@ async function render(mode, count) {
   const grid = element('div');
   grid.dataset.galleryGrid = mode;
   const more = element('a');
-  more.hidden = true;
+  more.hidden = false;
   const photos = Array.from({ length: count }, (_, i) => ({
     src: '/photos/' + String(i) + '.jpg',
     title: 'Photo ' + String(i),
@@ -46,17 +46,17 @@ test('homepage shows exactly three of five and exposes view more', async () => {
   assert.equal(more.hidden, false);
 });
 
-test('homepage hides view more with three photos', async () => {
+test('homepage keeps full-gallery link visible with three photos', async () => {
   const { grid, more } = await render('home', 3);
   assert.equal(grid.children.length, 3);
-  assert.equal(more.hidden, true);
+  assert.equal(more.hidden, false);
 });
 
 test('homepage displays an empty message when no photos exist', async () => {
   const { grid, more } = await render('home', 0);
   assert.equal(grid.children.length, 1);
   assert.equal(grid.children[0].className, 'gallery-empty');
-  assert.equal(more.hidden, true);
+  assert.equal(more.hidden, false);
 });
 
 test('full gallery lists all photos', async () => {
