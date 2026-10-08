@@ -17,7 +17,8 @@ examples are in [photos/README.md](photos/README.md).
 filename determines which photos are newest; Git filesystem modification dates
 are not reliable indicators of upload order. Undated photos appear last.
 
-Supported formats: JPG, JPEG, PNG, WebP, AVIF, GIF.
+Supported formats: JPG, JPEG, PNG, WebP, AVIF, GIF. You can also upload one
+ZIP of photos directly into photos/ — the build safely extracts the pictures.
 
 During every Netlify build, scripts/build-gallery.mjs finds all images in photos/,
 sorts them newest-first, generates dist/gallery-data.json and copies the site
