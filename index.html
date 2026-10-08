@@ -14,11 +14,12 @@
   <meta property="og:url" content="https://steelbrothers.cz/">
   <title>Steel Brothers — Jedna cesta. Jedna parta.</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%23151514'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-family='Arial' font-weight='bold' font-size='30' fill='%23f46b35'%3ESB%3C/text%3E%3C/svg%3E">
+  <link rel="preload" as="image" href="steel-brothers-logo.avif" type="image/avif">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header class="header">
-    <a class="brand" href="#home" aria-label="Steel Brothers — úvod"><span class="monogram">SB</span><span>STEEL<br>BROTHERS</span></a>
+    <a class="brand" href="#home" aria-label="Steel Brothers — úvod"><img class="brand-logo" src="steel-brothers-logo.avif" alt="" width="52" height="52"><span>STEEL<br>BROTHERS</span></a>
     <nav aria-label="Hlavní navigace"><a href="#club">O klubu</a><a href="#rides">Vyjížďky</a><a href="#gallery">Galerie</a></nav>
     <button class="signup small" disabled title="Registrace zatím není dostupná">PŘIDAT SE <span>BRZY</span></button>
   </header>
@@ -31,10 +32,8 @@
         <p class="intro">Steel Brothers je parta lidí, které baví motorky, společné vyjížďky a dobrá společnost. Bez zbytečného spěchu — hlavní je cesta a lidi kolem ní.</p>
         <div class="hero-actions"><a class="button" href="#club">POZNEJ NÁŠ KLUB</a><span class="action-note">RESPEKT. SVOBODA. BRATRSTVÍ.</span></div>
       </div>
-      <div class="hero-slot club-panel" role="img" aria-label="Steel Brothers Motorcycle Club">
-        <span class="slot-corner">SB / 2026</span>
-        <div class="club-emblem" aria-hidden="true"><span>SB</span><strong>STEEL BROTHERS</strong><small>MOTORCYCLE CLUB</small></div>
-        <span class="slot-bottom">ČESKÁ REPUBLIKA</span>
+      <div class="hero-slot club-panel">
+        <img class="hero-logo" src="steel-brothers-logo.avif" alt="Oficiální logo Steel Brothers: motocykl, společné gesto a rok 2026" width="640" height="640" decoding="async" fetchpriority="high">
       </div>
       <div class="hero-footer"><span>STEEL BROTHERS — MOTORCYCLE CLUB</span><a href="#club">POKRAČUJ DOLŮ ↓</a></div>
     </section>
