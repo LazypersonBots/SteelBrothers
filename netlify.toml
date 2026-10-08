@@ -1,5 +1,5 @@
 [build]
-  command = "node --test tests/gallery.test.mjs && node scripts/build-gallery.mjs"
+  command = "node --test && node scripts/build-gallery.mjs"
   publish = "dist"
 
 [[redirects]]
