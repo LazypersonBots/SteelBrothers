@@ -22,12 +22,12 @@ const routes = new Map([
   ['/activity-data.json', 'activity-data.json'],
   ['/activity.js', 'activity.js'],
   ['/signin.js', 'signin.js'],
-  ['/ride-motion.js', 'ride-motion.js'],
   ['/auth.css', 'auth.css'],
   ['/gallery-data.json', 'gallery-data.json'],
   ['/gallery.js', 'gallery.js'],
   ['/styles.css', 'styles.css'],
-  ['/steel-brothers-logo.avif', 'steel-brothers-logo.avif']
+  ['/steel-brothers-logo.avif', 'steel-brothers-logo.avif'],
+  ['/favicon.png', 'favicon.png']
 ]);
 const mime = {
   '.html': 'text/html; charset=utf-8',
