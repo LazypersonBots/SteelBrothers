@@ -1,27 +1,39 @@
-# Steel Brothers verification email (design only)
+# Steel Brothers — real email-code verification with Resend
 
-This is a branded, responsive HTML email template for a future account
-verification system. It is **not connected to Resend or the /signin demo**.
+This directory contains the decorated email used by the production Netlify Functions.
+The server-only bundled template copy lives in server/email-template.mjs.
 
-## Resend setup (after DNS verification)
+## One-time setup in Netlify
 
-1. Go to Resend > Templates and create a template or import HTML.
-2. Import `verification.html`.
-3. Define a string template variable named `VERIFICATION_CODE`, matching
-   `{{{VERIFICATION_CODE}}}` in the HTML, and publish the template.
-4. Suggested sender: `Steel Brothers <verification@steelbrothers.cz>`
-   (only after Resend confirms domain verification).
-5. Suggested subject: `Steel Brothers — Ověřovací kód`.
-6. When server-side authentication is implemented, generate a fresh random
-   six-digit code per verification request, enforce a **real** 10-minute TTL,
-   limit attempts and resends, store a secure code hash only, and call the
-   Resend API **from a trusted server**, never in frontend JavaScript.
+1. Confirm Resend lists steelbrothers.cz as VERIFIED under Domains.
+2. In the SteelBrothers Netlify project: Project configuration > Environment variables > Add variable.
+   Make both variables available to Functions:
+   - RESEND_API_KEY = sending key from the separate SteelBrothers Resend account.
+   - STEELBROTHERS_VERIFICATION_SECRET = a randomly generated secret, at least 32 characters.
+     Generate locally with Node (do not paste the output into chat):
+     node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+3. Redeploy after saving secrets.
+4. Open https://steelbrothers.cz/signin/, enter an email, click POSLAT KÓD,
+   enter the 6-digit code received, then click OVĚŘIT.
+5. Troubleshoot in Resend > Logs and Netlify Functions logs. Never share secrets.
 
-The email says it expires in ten minutes. This is a design assumption
-until the backend enforces it.
+## What works, what does not
 
-Use the real code in the `VERIFICATION_CODE` variable. Do **not** hardcode
-`482719` or any example code in production.
+- This enables real transactional Resend email-code sending and validation.
+- The sender is Steel Brothers <verification@steelbrothers.cz>.
+- Six-digit crypto-random codes, 10-minute expiry, one-time use.
+- Maximum five guesses, 60-second resend cooldown, IP rate limits.
+- Same-origin JSON-only calls, server-side Resend key.
+- Only HMAC-protected codes and hashed email identifiers are stored in
+  SteelBrothers' own Netlify Blobs storage; no passwords are sent.
+- Deploy previews cannot send real emails; production only.
+- No personal Supabase account is used or touched.
 
-Do not place Resend API keys in Git, public HTML, or client-side JavaScript.
-The existing site is static; no real account verification exists yet.
+IMPORTANT: Email verification works independently, but REGISTER and LOGIN
+are still explicitly demo-only. Successful verification is not account
+creation or authentication. Do not treat it as a persistent member record.
+
+Netlify functions: /api/email/send and /api/email/verify
+
+Run tests: node --test
+Netlify build: node --test && node scripts/build-gallery.mjs

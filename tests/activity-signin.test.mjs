@@ -70,15 +70,19 @@ test('both activity and gallery have working return and navigation links', async
   assert.match(gallery,/href="\/activity\/">Aktivity/);
 });
 
-test('signin demo has required email, nickname and password, no fake email verification', async () => {
+test('signin keeps account creation demo and adds real standalone email verification', async () => {
   const page = await read('signin/index.html');
   const js = await read('signin.js');
   assert.match(page,/id="email"[^>]+type="email" required/);
   assert.match(page,/id="nickname"[^>]+required/);
   assert.match(page,/id="password"[^>]+type="password" required minlength="8"/);
   assert.match(page,/id="confirm-password"[^>]+required/);
-  assert.match(page,/Ověření e-mailu: TBA/);
-  assert.match(page,/žádné údaje se neposílají ani neukládají/);
+  assert.match(page, /id="send-email-code"/);
+  assert.match(page, /id="email-code"/);
+  assert.match(page, /id="verify-email-code"/);
+  assert.match(page, /src="\/email-verification\.js"/);
+  assert.match(page, /DEMO ÚČTY/);
+  assert.match(page, /Vytvoření účtu zatím připravujeme/);
   assert.match(js,/event\.preventDefault\(\)/);
   assert.match(js,/reportValidity\(\)/);
   assert.doesNotMatch(js,/\bfetch\s*\(|\blocalStorage\b\s*\./);
@@ -134,7 +138,7 @@ test('Netlify and local preview serve both secondary pages', async () => {
     assert.ok(preview.includes("['/" + slug + "', '" + slug + "/index.html']"));
     assert.ok(build.includes("join(output, '" + slug + "')"));
   }
-  for (const name of ['activity.js','activity-data.json','signin.js','auth.css','favicon.png']) {
+  for (const name of ['activity.js','activity-data.json','signin.js','email-verification.js','auth.css','favicon.png']) {
     assert.ok(build.includes("'" + name + "'"));
   }
 });

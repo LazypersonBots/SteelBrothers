@@ -32,7 +32,7 @@
     password.autocomplete = registration ? 'new-password' : 'current-password';
     heading.textContent = registration ? 'Vytvořit účet.' : 'Přihlásit se.';
     subtitle.textContent = registration
-      ? 'Připoj se ke Steel Brothers. Účty a ověřování zatím připravujeme.'
+      ? 'Připoj se ke Steel Brothers. Tvorba účtů je demo, e-mail ale můžeš ověřit.'
       : 'Vítej zpět. Přihlášení je prozatím jen interaktivní ukázka.';
     submit.textContent = registration ? 'ZKONTROLOVAT REGISTRACI →' : 'VYZKOUŠET PŘIHLÁŠENÍ →';
     feedback.textContent = '';
@@ -73,8 +73,12 @@
     if (!form.reportValidity()) return;
     // Never persist personal data or passwords.
     feedback.dataset.status = 'demo';
+    const emailVerified = mode === 'register' &&
+      verifyField.dataset.verifiedEmail === email.value.trim().toLowerCase();
     feedback.textContent = mode === 'register'
-      ? 'Formulář je vyplněný správně. Toto je pouze demo — účet nebyl vytvořen a e-mail se neodeslal.'
+      ? emailVerified
+        ? 'E-mail byl ověřen, ale vytvoření účtu je stále demo. Účet nebyl vytvořen.'
+        : 'Registrace je stále demo. Pro skutečné ověření e-mailu použij tlačítko Poslat kód.'
       : 'Toto je pouze demo — nepřihlásili jsme tě a heslo se nikam neodeslalo.';
     // Clear secrets promptly; preserve only the informational success state.
     password.value = '';
