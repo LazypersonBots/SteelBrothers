@@ -55,8 +55,8 @@
 .auth-ride-wind-one{top:50%;animation-delay:0s}
 .auth-ride-wind-two{top:58%;animation-delay:-1.3s;width:25%}
 .auth-ride-wind-three{top:66%;animation-delay:-2.3s;width:40%}
-.auth-ride-bike{position:absolute;z-index:4;top:35%;left:50%;width:min(112%,690px);height:auto;transform:translateX(-50%);filter:drop-shadow(0 18px 18px rgba(0,0,0,.6));animation:auth-motor-idle 2.7s ease-in-out infinite}
-.auth-bike-headlight{animation:auth-headlight 2.7s ease-in-out infinite}
+.auth-ride-bike{position:absolute;z-index:4;top:15%;left:50%;width:min(72%,400px);height:auto;transform:translateX(-50%);filter:drop-shadow(0 22px 17px rgba(0,0,0,.75));animation:auth-motor-idle 2.7s ease-in-out infinite}
+.auth-ride-tail-light{animation:auth-headlight 2.7s ease-in-out infinite}
 .auth-ride-ground-label{position:absolute;z-index:4;bottom:24%;left:7%;right:7%;display:flex;justify-content:space-between;gap:10px;color:#d5a98d;font-size:10px;letter-spacing:2.3px;font-weight:800}
 .auth-showcase-bottom{position:absolute;z-index:5;bottom:8%;left:20px;right:20px;text-align:center}
 .auth-showcase-bottom p{font-family:Impact,'Arial Narrow',sans-serif;font-size:clamp(22px,2.6vw,42px);letter-spacing:2px;color:#faf1e8;text-shadow:0 2px 15px #0e0e0e}
@@ -67,6 +67,6 @@
 @keyframes auth-headlight{0%,100%{opacity:.45}50%{opacity:1}}
 @keyframes auth-rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:1040px){.auth-layout{grid-template-columns:minmax(0,1fr) minmax(300px,.85fr)}.auth-form-panel{padding:25px 28px 45px}.auth-showcase-bottom span{letter-spacing:3px}}
-@media(max-width:760px){.auth-layout{grid-template-columns:1fr}.auth-form-panel{min-height:auto;padding:18px 6% 26px}.auth-content{margin:22px auto 0;padding:10px 0 20px}.auth-showcase{min-height:310px}.auth-ride-bike{top:23%;width:min(103%,490px)}.auth-ride-sun{top:0%;width:165px;height:165px}.auth-ride-road{bottom:-53%;height:115%}.auth-ride-ground-label{bottom:27%;font-size:9px}.auth-ride-topline{top:7%;font-size:8px}.auth-showcase-bottom{bottom:14px}.auth-showcase-bottom p{font-size:22px}.auth-showcase-bottom span{font-size:8px}}
+@media(max-width:760px){.auth-layout{grid-template-columns:1fr}.auth-form-panel{min-height:auto;padding:18px 6% 26px}.auth-content{margin:22px auto 0;padding:10px 0 20px}.auth-showcase{min-height:310px}.auth-ride-bike{top:1%;width:min(57%,228px)}.auth-ride-sun{top:0%;width:165px;height:165px}.auth-ride-road{bottom:-53%;height:115%}.auth-ride-ground-label{bottom:27%;font-size:9px}.auth-ride-topline{top:7%;font-size:8px}.auth-showcase-bottom{bottom:14px}.auth-showcase-bottom p{font-size:22px}.auth-showcase-bottom span{font-size:8px}}
 @media(max-width:380px){.auth-content h1{font-size:34px}.auth-topbar{gap:9px}.auth-brand{font-size:10px;letter-spacing:.5px}.auth-back{font-size:11px}}
-@media(prefers-reduced-motion:reduce){.auth-ride-center-stripes,.auth-ride-wind,.auth-ride-bike,.auth-bike-headlight,.auth-content{animation:none!important}.auth-ride-bike{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.auth-ride-center-stripes,.auth-ride-wind,.auth-ride-bike,.auth-ride-tail-light,.auth-content{animation:none!important}.auth-ride-bike{transform:translateX(-50%)}}
