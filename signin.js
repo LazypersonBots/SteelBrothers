@@ -71,7 +71,7 @@
     }
     confirm.setCustomValidity('');
     if (!form.reportValidity()) return;
-    // Never persist personal data or passwords, even in localStorage.
+    // Never persist personal data or passwords.
     feedback.dataset.status = 'demo';
     feedback.textContent = mode === 'register'
       ? 'Formulář je vyplněný správně. Toto je pouze demo — účet nebyl vytvořen a e-mail se neodeslal.'
