@@ -85,13 +85,20 @@ test('signin demo has required email, nickname and password, no fake email verif
   assert.doesNotMatch(page,/<form[^>]+action=/);
 });
 
-test('signin animation respects reduced motion and uses real club logo', async () => {
+test('sign-in scene is an original motorcycle and animated road, not a spinning logo', async () => {
   const page = await read('signin/index.html');
   const css = await read('auth.css');
-  assert.match(page,/auth-center-logo[^>]+steel-brothers-logo\.avif/);
-  assert.match(css,/@keyframes auth-spin/);
+  assert.match(page,/class="auth-ride-bike"/);
+  assert.match(page,/class="auth-ride-road"/);
+  assert.match(page,/class="auth-ride-center-stripes"/);
+  assert.match(page,/JEDNA CESTA\. JEDNA PARTA\./);
+  assert.match(css,/@keyframes auth-road-speed/);
+  assert.match(css,/@keyframes auth-wind-rush/);
+  assert.match(css,/@keyframes auth-motor-idle/);
   assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
   assert.match(css,/\.auth-page \[hidden\]\{display:none!important\}/);
+  assert.doesNotMatch(page,/auth-orbit|auth-center-glow|auth-center-logo/);
+  assert.doesNotMatch(css,/@keyframes auth-spin|@keyframes auth-float|\.auth-orbit/);
 });
 
 test('Netlify and local preview serve both secondary pages', async () => {
