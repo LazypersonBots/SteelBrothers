@@ -94,17 +94,36 @@ test('all four pages use the official PNG favicon, never SB letter artwork', asy
   }
 });
 
-test('sign-in visual is minimal, with logo and one subtle CSS-only accent', async () => {
+test('sign-in design has the official crest, clear hierarchy, and restrained CSS motion', async () => {
   const html = await read('signin/index.html');
   const css = await read('auth.css');
-  assert.match(html, /class="auth-simple-logo" src="\/steel-brothers-logo\.avif"/);
-  assert.match(html, /class="auth-simple-line"/);
+  const js = await read('signin.js');
+  assert.match(html, /class="auth-story"/);
+  assert.match(html, /class="auth-story-crest"/);
+  assert.match(html, /src="\/steel-brothers-logo\.avif"/);
+  assert.match(html, /class="auth-story-diagonal"/);
+  assert.match(html, /class="auth-story-motion"/);
   assert.match(html, /JEDNA CESTA\./);
-  assert.match(css, /@keyframes auth-simple-slide/);
+  assert.match(html, /JEDNA PARTA\./);
+  assert.match(css, /@keyframes auth-story-float/);
+  assert.match(css, /@keyframes auth-story-speed/);
+  assert.match(css, /@keyframes auth-story-enter/);
+  assert.match(css, /@media\(max-width:760px\)/);
   assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
-  assert.doesNotMatch(html, /ride-motion\.js|auth-drive-road|auth-drive-dial|auth-drive-needle/);
-  assert.doesNotMatch(css, /auth-drive-road|auth-drive-dial|auth-drive-needle/);
+  assert.match(css, /\.auth-story-motion i\{opacity:0!important\}/);
+  assert.doesNotMatch(html, /ride-motion\.js|auth-drive-road|auth-drive-dial|auth-simple-panel|auth-ride-bike/);
+  assert.doesNotMatch(css, /auth-drive-road|auth-drive-dial|auth-simple-slide|auth-ride-bike/);
+  assert.doesNotMatch(js, /fetch\s*\(|supabase/i);
 });
+
+test('sign-in and other pages retain the official Steel Brothers favicon', async () => {
+  for (const path of ['index.html','activity/index.html','gallery/index.html','signin/index.html']) {
+    const html = await read(path);
+    assert.match(html, /<link rel="icon" href="\/favicon\.png" type="image\/png"/);
+    assert.doesNotMatch(html, /data:image\/svg\+xml/);
+  }
+});
+
 
 test('Netlify and local preview serve both secondary pages', async () => {
   const netlify = await read('netlify.toml');
