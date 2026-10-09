@@ -70,7 +70,7 @@ test('both activity and gallery have working return and navigation links', async
   assert.match(gallery,/href="\/activity\/">Aktivity/);
 });
 
-test('signin demo has required email, nickname and password, no fake email verification', async () => {
+test('signin keeps account creation demo and adds real standalone email verification', async () => {
   const page = await read('signin/index.html');
   const js = await read('signin.js');
   assert.match(page,/id="email"[^>]+type="email" required/);
@@ -82,7 +82,7 @@ test('signin demo has required email, nickname and password, no fake email verif
   assert.match(page, /id="verify-email-code"/);
   assert.match(page, /src="\/email-verification\.js"/);
   assert.match(page, /DEMO ÚČTY/);
-  assert.match(page, /Tvorba účtů je zatím demo/);
+  assert.match(page, /Vytvoření účtu zatím připravujeme/);
   assert.match(js,/event\.preventDefault\(\)/);
   assert.match(js,/reportValidity\(\)/);
   assert.doesNotMatch(js,/\bfetch\s*\(|\blocalStorage\b\s*\./);
