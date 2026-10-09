@@ -27,8 +27,8 @@ jobs:
           test -s dist/activity.js
           test -s dist/auth.css
           test -s dist/signin.js
-          test -s dist/ride-motion.js
           test -s dist/index.html
           test -s dist/gallery.js
           test -s dist/steel-brothers-logo.avif
+          test -s dist/favicon.png
           node -e "const p=require('./dist/gallery-data.json');if(!Array.isArray(p.photos))process.exit(1)"
