@@ -89,6 +89,9 @@ test('sign-in scene is an original motorcycle and animated road, not a spinning 
   const page = await read('signin/index.html');
   const css = await read('auth.css');
   assert.match(page,/class="auth-ride-bike"/);
+  assert.match(page,/Rear-facing bike and rider/);
+  assert.match(page,/class="auth-ride-tail-light"/);
+  assert.doesNotMatch(page,/auth-bike-wheels/);
   assert.match(page,/class="auth-ride-road"/);
   assert.match(page,/class="auth-ride-center-stripes"/);
   assert.match(page,/JEDNA CESTA\. JEDNA PARTA\./);
