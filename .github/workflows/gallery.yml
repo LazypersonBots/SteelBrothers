@@ -21,6 +21,12 @@ jobs:
         run: |
           test -s dist/gallery-data.json
           test -s dist/gallery/index.html
+          test -s dist/activity/index.html
+          test -s dist/signin/index.html
+          test -s dist/activity-data.json
+          test -s dist/activity.js
+          test -s dist/auth.css
+          test -s dist/signin.js
           test -s dist/index.html
           test -s dist/gallery.js
           test -s dist/steel-brothers-logo.avif
