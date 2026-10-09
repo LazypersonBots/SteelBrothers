@@ -27,6 +27,7 @@ jobs:
           test -s dist/activity.js
           test -s dist/auth.css
           test -s dist/signin.js
+          test -s dist/ride-motion.js
           test -s dist/index.html
           test -s dist/gallery.js
           test -s dist/steel-brothers-logo.avif
