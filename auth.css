@@ -81,3 +81,21 @@
 @media(max-width:760px){.auth-layout{grid-template-columns:1fr}.auth-form-panel{padding:18px 6% 26px}.auth-content{margin:22px auto 0;padding:10px 0 20px}.auth-showcase,.auth-story{min-height:480px}.auth-story{padding:25px 6% 30px}.auth-story-center{min-height:210px;padding:8px 20px}.auth-story-crest{width:min(46%,190px)}.auth-story-bottom h2{font-size:clamp(40px,10vw,60px)}.auth-story-intro{margin:13px 0 18px}.auth-story-side-label{right:3px}}
 @media(max-width:380px){.auth-content h1{font-size:34px}.auth-topbar{gap:9px}.auth-brand{font-size:10px;letter-spacing:.5px}.auth-back{font-size:11px}.auth-story-year{max-width:90px;font-size:8px}.auth-story-crest{width:48%}.auth-story-pretitle{font-size:9px}.auth-story-bottom h2{font-size:39px}}
 @media(prefers-reduced-motion:reduce){.auth-story::after,.auth-story-crest,.auth-story-crest img,.auth-story-bottom,.auth-story-motion i,.auth-content{animation:none!important}.auth-story-motion i{opacity:0!important}}
+
+
+/* Email verification: compact controls that match the existing sign-in. */
+.auth-verification-block{margin:-4px 0 19px;border:1px solid #4b3c32;background:rgba(38,31,26,.55);padding:13px 14px;border-radius:8px}
+.auth-verify-line{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:#e7d9cb;font-weight:700}
+.auth-verify-action{border:1px solid #a55b37;background:#4b2d22;color:#ffd2b4;border-radius:6px;padding:11px 14px;font-size:11px;font-weight:800;letter-spacing:.5px;cursor:pointer;white-space:nowrap}
+.auth-verify-action:hover:not(:disabled){background:#673524;border-color:#ed7a40}
+.auth-verify-action:disabled{cursor:not-allowed;opacity:.55}
+.auth-verify-status{margin:11px 0 0;font-size:11px;line-height:1.55;color:#bcb1a7}
+.auth-verify-status[data-status=error]{color:#ff9d85}
+.auth-verify-status[data-status=success]{color:#aadcb2}
+.auth-code-entry{margin-top:17px;display:flex;flex-direction:column;gap:9px}
+.auth-code-entry[hidden]{display:none!important}
+.auth-code-entry label{font-size:12px;font-weight:700;color:#e6ded5}
+.auth-code-row{display:flex;gap:10px;align-items:center}
+.auth-code-row input{width:min(100%,185px);height:44px;border:1px solid #6e513e;border-radius:7px;background:#171615;color:#f6f0eb;font-size:20px;letter-spacing:5px;font-weight:800;text-align:center;outline:none;font-variant-numeric:tabular-nums}
+.auth-code-row input:focus{border-color:#f46b35;box-shadow:0 0 0 3px rgba(244,107,53,.12)}
+@media(max-width:390px){.auth-verify-line{align-items:flex-start}.auth-code-row input{width:145px;min-width:0}.auth-code-row{gap:7px}.auth-verify-action{padding:10px}}
