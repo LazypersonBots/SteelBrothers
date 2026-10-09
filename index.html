@@ -17,12 +17,13 @@
   <link rel="preload" as="image" href="steel-brothers-logo.avif" type="image/avif">
   <link rel="stylesheet" href="styles.css">
   <script src="/gallery.js" defer></script>
+  <script src="/activity.js" defer></script>
 </head>
 <body>
   <header class="header">
     <a class="brand" href="#home" aria-label="Steel Brothers — úvod"><img class="brand-logo" src="steel-brothers-logo.avif" alt="" width="52" height="52"><span>STEEL<br>BROTHERS</span></a>
-    <nav aria-label="Hlavní navigace"><a href="#club">O klubu</a><a href="#rides">Vyjížďky</a><a href="/gallery/">Galerie</a></nav>
-    <button class="signup small" disabled title="Registrace zatím není dostupná">PŘIDAT SE <span>BRZY</span></button>
+    <nav aria-label="Hlavní navigace"><a href="#club">O klubu</a><a href="/activity/">Aktivity</a><a href="/gallery/">Galerie</a></nav>
+    <a class="header-action" href="/signin/">PŘIDAT SE <span>DEMO</span></a>
   </header>
 
   <main>
@@ -47,11 +48,13 @@
     </section>
 
     <section class="section rides" id="rides" aria-labelledby="rides-title">
-      <div class="section-top"><div><p class="eyebrow accent"> / NA CESTĚ</p><h2 id="rides-title">DALŠÍ DŮVOD VYRAZIT.</h2></div><span class="badge">PROGRAM PŘIPRAVUJEME</span></div>
-      <div class="ride-list">
-        <article class="ride"><div><p class="ride-label">SPOLEČNÁ VYJÍŽĎKA</p><h3>Sobota na vedlejších silnicích</h3><p>Pohodové tempo, pár zatáček a zastávka na oběd.</p></div><span class="ride-status">Termín připravujeme</span></article>
-        <article class="ride"><div><p class="ride-label">KLUBOVÉ SETKÁNÍ</p><h3>Kafe, motorky a dobrá společnost</h3><p>Čas se potkat, probrat stroje a naplánovat další cestu.</p></div><span class="ride-status">Termín připravujeme</span></article>
-        <article class="ride"><div><p class="ride-label">VÍKEND NA DVOU KOLECH</p><h3>Na chvíli nechat všechno za sebou</h3><p>Dva dny venku, nové trasy a společné zážitky.</p></div><span class="ride-status">Termín připravujeme</span></article>
+      <div class="section-top"><div><p class="eyebrow accent"> / CO SE CHYSTÁ</p><h2 id="rides-title">NAŠE AKTIVITY.</h2></div><span class="badge">PROGRAM PŘIPRAVUJEME</span></div>
+      <p class="activity-section-intro">Tři nejnovější položky našeho programu. Zatím jde o ukázkové aktivity bez potvrzených termínů.</p>
+      <div class="activity-grid activity-grid-home" data-activity-list="home" aria-live="polite">
+        <p class="activity-empty">Načítání aktivit…</p>
+      </div>
+      <div class="gallery-actions">
+        <a class="gallery-more-link" href="/activity/">ZOBRAZIT VŠECHNY AKTIVITY <span aria-hidden="true">→</span></a>
       </div>
     </section>
 
@@ -65,7 +68,7 @@
       </div>
     </section>
 
-    <section class="join section" aria-labelledby="join-title"><div><p class="eyebrow">DALŠÍ KILOMETRY MŮŽEME JET SPOLU.</p><h2 id="join-title">MÁŠ STEJNÝ<br><span>SMĚR?</span></h2></div><div class="join-action"><p>Seznam se s partou.<br>O zbytku si povíme u motorek.</p><button class="signup large" disabled>CHCI SE PŘIDAT <span>BRZY</span></button><small>Registrace zatím není spuštěná.</small></div></section>
+    <section class="join section" aria-labelledby="join-title"><div><p class="eyebrow">DALŠÍ KILOMETRY MŮŽEME JET SPOLU.</p><h2 id="join-title">MÁŠ STEJNÝ<br><span>SMĚR?</span></h2></div><div class="join-action"><p>Seznam se s partou.<br>O zbytku si povíme u motorek.</p><a class="join-demo-link" href="/signin/">CHCI SE PŘIDAT <span>DEMO</span></a><small>Registrace je zatím pouze interaktivní ukázka.</small></div></section>
   </main>
   <footer><a href="#home" class="footer-brand">STEEL BROTHERS<span>MOTORCYCLE CLUB</span></a><p>Steel Brothers · Motorcycle Club</p><span>© 2026 STEEL BROTHERS</span></footer>
 </body>

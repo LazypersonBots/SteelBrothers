@@ -1,0 +1,52 @@
+{
+  "activities": [
+    {
+      "id": "ride-local",
+      "category": "Společná vyjížďka",
+      "title": "Sobota na vedlejších silnicích",
+      "description": "Pohodové tempo, pár zatáček a zastávka na oběd.",
+      "status": "Termín připravujeme",
+      "publishedAt": null
+    },
+    {
+      "id": "meetup-coffee",
+      "category": "Klubové setkání",
+      "title": "Kafe, motorky a dobrá společnost",
+      "description": "Čas se potkat, probrat stroje a naplánovat další cestu.",
+      "status": "Termín připravujeme",
+      "publishedAt": null
+    },
+    {
+      "id": "weekend-trip",
+      "category": "Víkend na dvou kolech",
+      "title": "Na chvíli nechat všechno za sebou",
+      "description": "Dva dny venku, nové trasy a společné zážitky.",
+      "status": "Termín připravujeme",
+      "publishedAt": null
+    },
+    {
+      "id": "evening",
+      "category": "Plánovaná aktivita",
+      "title": "Večerní společná jízda",
+      "description": "Prostor pro další klubovou vyjížďku. Podrobnosti doplníme později.",
+      "status": "Připravujeme",
+      "publishedAt": null
+    },
+    {
+      "id": "garage",
+      "category": "Plánovaná aktivita",
+      "title": "Setkání u motorek",
+      "description": "Zatím jen ukázková karta. Informace o akci přibudou později.",
+      "status": "Připravujeme",
+      "publishedAt": null
+    },
+    {
+      "id": "long-road",
+      "category": "Plánovaná aktivita",
+      "title": "Další společné kilometry",
+      "description": "Místo pro nové klubové zážitky a aktivity. Termín bude doplněn.",
+      "status": "Připravujeme",
+      "publishedAt": null
+    }
+  ]
+}

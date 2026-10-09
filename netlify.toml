@@ -6,3 +6,13 @@
   from = "/gallery"
   to = "/gallery/"
   status = 301
+
+[[redirects]]
+  from = "/activity"
+  to = "/activity/"
+  status = 301
+
+[[redirects]]
+  from = "/signin"
+  to = "/signin/"
+  status = 301

@@ -53,3 +53,27 @@ The official Steel Brothers logo is included as steel-brothers-logo.avif.
 
 The site keeps existing noindex directives while unfinished. Only remove them
 when the owner explicitly approves search-engine indexing.
+
+
+## Activities
+
+The homepage displays the first three newest entries from activity-data.json.
+The complete /activity/ page shows all activities, with a back-to-home button.
+Current entries are clearly marked as placeholders with no confirmed dates.
+Replace them with real club events when dates and details are available.
+If a real entry has a valid publishedAt ISO date, it sorts ahead of undated placeholders.
+
+## Sign-in demo
+
+/signin/ includes registration and sign-in tabs styled after the supplied design
+reference, with the real Steel Brothers logo and CSS orbital animation.
+
+* Nickname (registration only), required email, password (minimum eight characters)
+  and confirmation (registration only).
+* Email verification is shown as TBA: no verification email is sent.
+* Client-side demo validates fields and clearly confirms no account was created.
+* No login/auth backend, no credential submission, and no password storage.
+* Respect reduced-motion settings.
+
+This page is UI-only. Do not treat it as a real login until a secure server-side
+identity provider, email verification service, and privacy notices are configured.
