@@ -8,7 +8,7 @@ export default async function handler(request) {
   const { data, error } = await readEmailPayload(request, ['email', 'code']);
   if (error) return error;
   try {
-    const store = getStore({ name: 'steelbrothers-email-codes-v1', region: 'eu-central-1', consistency: 'strong' });
+    const store = getStore({ name: 'steelbrothers-email-codes-v1', consistency: 'strong' });
     const service = makeEmailVerification({
       store,
       secret: process.env.STEELBROTHERS_VERIFICATION_SECRET,
