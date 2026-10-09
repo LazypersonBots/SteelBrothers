@@ -10,11 +10,10 @@
   <link rel="canonical" href="https://steelbrothers.cz/signin/">
   <meta property="og:title" content="Přihlášení (demo) | Steel Brothers">
   <title>Přihlášení (demo) | Steel Brothers</title>
-  <link rel="icon" href="/steel-brothers-logo.avif" type="image/avif">
+  <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/auth.css">
   <script src="/signin.js" defer></script>
-  <script src="/ride-motion.js" defer></script>
 </head>
 <body class="auth-page">
   <main class="auth-layout">
@@ -71,53 +70,13 @@
         <p class="auth-footer-note">Bez skutečného přihlášení, odesílání e-mailů nebo ukládání hesel.</p>
       </div>
     </section>
-    <aside class="auth-showcase" aria-label="Animovaná scéna Steel Brothers s pohyblivou silnicí a tachometrem">
-      <div class="auth-drive-scene">
-        <div class="auth-drive-ambient" aria-hidden="true"></div>
-        <div class="auth-drive-distant" aria-hidden="true"></div>
-        <div class="auth-drive-near" aria-hidden="true"></div>
-        <div class="auth-drive-horizon" aria-hidden="true"></div>
-        <div class="auth-drive-road" aria-hidden="true"><div class="auth-drive-road-dashes"></div></div>
-        <div class="auth-drive-streaks" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-        <div class="auth-drive-screen">
-          <div class="auth-drive-header">
-            <div class="auth-drive-monogram"><span>SB</span><small>EST 26</small></div>
-            <div class="auth-drive-header-copy"><strong>STEEL BROTHERS</strong><span>MOTORCYCLE CLUB / CZECH REPUBLIC</span></div>
-            <span class="auth-drive-status"><i aria-hidden="true"></i> RIDE ACTIVE</span>
-          </div>
-          <div class="auth-drive-cluster" aria-label="Animovaný ukazatel rychlosti">
-            <p class="auth-drive-kicker">THE ROAD IS CALLING</p>
-            <svg class="auth-drive-dial" viewBox="0 0 360 230" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <defs>
-                <linearGradient id="auth-dial-hot" x1="0" x2="1" y1="1" y2="0">
-                  <stop stop-color="#b5462a" offset="0"/>
-                  <stop stop-color="#f46b35" offset=".55"/>
-                  <stop stop-color="#ffbf84" offset="1"/>
-                </linearGradient>
-              </defs>
-              <path class="auth-drive-dial-track" d="M 42 188 A 138 138 0 0 1 318 188" fill="none" stroke-width="7" stroke-linecap="round"/>
-              <path class="auth-drive-dial-glow" d="M 42 188 A 138 138 0 0 1 318 188" fill="none" stroke="url(#auth-dial-hot)" stroke-width="7" stroke-linecap="round" pathLength="100"/>
-              <g class="auth-drive-ticks" stroke-linecap="round">
-                <path d="M 42 188 L 62 188 M 49 142 L 68 148 M 69 100 L 85 113 M 103 68 L 115 85 M 143 51 L 148 73 M 180 48 L 180 70 M 217 51 L 212 73 M 257 68 L 245 85 M 291 100 L 275 113 M 311 142 L 292 148 M 318 188 L 298 188"/>
-              </g>
-              <g class="auth-drive-needle" id="auth-drive-needle">
-                <path d="M 180 188 L 176 74 L 184 74 Z" fill="#f46b35"/>
-                <circle cx="180" cy="188" r="10" fill="#f9c1a0"/>
-                <circle cx="180" cy="188" r="5" fill="#1c1d1c"/>
-              </g>
-            </svg>
-            <div class="auth-drive-readout" aria-hidden="true">
-              <strong id="auth-drive-speed">082</strong><span>KM/H</span>
-            </div>
-            <div class="auth-drive-metrics"><span>GEAR <strong>06</strong></span><span>MODE <strong>TOUR</strong></span><span>ROAD <strong>∞</strong></span></div>
-          </div>
-          <div class="auth-drive-footer">
-            <p class="auth-drive-microtitle">NO DESTINATION REQUIRED</p>
-            <h2>JEDNA CESTA.<br><em>JEDNA PARTA.</em></h2>
-            <p class="auth-drive-description">Pro lidi, kteří žijí pro jízdu.</p>
-            <div class="auth-drive-footer-line"><span>KEEP MOVING <b>→</b></span><button type="button" class="auth-drive-toggle" id="auth-drive-toggle" aria-pressed="false">POZASTAVIT ANIMACI</button></div>
-          </div>
-        </div>
+    <aside class="auth-showcase" aria-label="Steel Brothers">
+      <div class="auth-simple-panel">
+        <img class="auth-simple-logo" src="/steel-brothers-logo.avif" alt="Logo motorkářského klubu Steel Brothers" width="220" height="220" decoding="async">
+        <p class="auth-simple-kicker">STEEL BROTHERS · MOTORCYCLE CLUB</p>
+        <h2>JEDNA CESTA.<br><span>JEDNA PARTA.</span></h2>
+        <p class="auth-simple-caption">Motorky. Přátelé. Společné kilometry.</p>
+        <div class="auth-simple-line" aria-hidden="true"><span></span></div>
       </div>
     </aside>
   </main>
