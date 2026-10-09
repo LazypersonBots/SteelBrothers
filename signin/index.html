@@ -80,45 +80,54 @@
         <div class="auth-ride-wind auth-ride-wind-one"></div>
         <div class="auth-ride-wind auth-ride-wind-two"></div>
         <div class="auth-ride-wind auth-ride-wind-three"></div>
-        <svg class="auth-ride-bike" viewBox="0 0 620 400" xmlns="http://www.w3.org/2000/svg" focusable="false">
+        <!-- Rear-facing bike and rider, aligned with the road's vanishing point. -->
+        <svg class="auth-ride-bike" viewBox="0 0 520 550" xmlns="http://www.w3.org/2000/svg" focusable="false">
           <defs>
-            <linearGradient id="sb-metal" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f6eee5"/><stop offset="1" stop-color="#837a74"/></linearGradient>
-            <linearGradient id="sb-tank" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fa9655"/><stop offset=".55" stop-color="#ec622d"/><stop offset="1" stop-color="#843618"/></linearGradient>
+            <linearGradient id="bike-body" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fb9960"/><stop offset=".52" stop-color="#df622e"/><stop offset="1" stop-color="#8b351c"/>
+            </linearGradient>
+            <linearGradient id="bike-metal" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#514c47"/><stop offset=".5" stop-color="#e6d9c9"/><stop offset="1" stop-color="#4b4540"/>
+            </linearGradient>
+            <linearGradient id="rider-jacket" x1="0" y1="0" x2=".7" y2="1">
+              <stop offset="0" stop-color="#424345"/><stop offset=".5" stop-color="#222426"/><stop offset="1" stop-color="#111314"/>
+            </linearGradient>
           </defs>
-          <ellipse cx="315" cy="370" rx="251" ry="16" fill="#080909" opacity=".55"/>
-          <g class="auth-bike-wheels">
-            <circle cx="146" cy="290" r="77" fill="#171717" stroke="#090909" stroke-width="17"/>
-            <circle cx="146" cy="290" r="65" fill="#242321" stroke="#9a9187" stroke-width="4"/>
-            <circle cx="146" cy="290" r="51" stroke="#6b655e" stroke-width="1.5" stroke-dasharray="3 9"/>
-            <circle cx="146" cy="290" r="17" fill="#c5bbb1" stroke="#151515" stroke-width="5"/>
-            <circle cx="462" cy="290" r="77" fill="#171717" stroke="#090909" stroke-width="17"/>
-            <circle cx="462" cy="290" r="65" fill="#242321" stroke="#9a9187" stroke-width="4"/>
-            <circle cx="462" cy="290" r="51" stroke="#6b655e" stroke-width="1.5" stroke-dasharray="3 9"/>
-            <circle cx="462" cy="290" r="17" fill="#c5bbb1" stroke="#151515" stroke-width="5"/>
-            <path d="M146 237V343M93 290H199M108 252L184 328M184 252L108 328M462 237V343M409 290H515M424 252L500 328M500 252L424 328" stroke="#8e857c" stroke-width="2"/>
-          </g>
-          <g stroke-linecap="round" stroke-linejoin="round">
-            <path d="M146 290 218 217 335 291 146 290 256 186 335 291 390 228" stroke="#bdb4a9" stroke-width="11" fill="none"/>
-            <path d="M462 290 413 168 392 138" stroke="url(#sb-metal)" stroke-width="12" fill="none"/>
-            <path d="M398 136 446 128 473 145" stroke="#cbc2b9" stroke-width="9" fill="none"/>
-            <path d="M402 177 437 165" stroke="#4e4942" stroke-width="5" fill="none"/>
-            <path d="M212 195 240 178 321 180 349 194" stroke="#141414" stroke-width="18" fill="none"/>
-            <path d="M246 192 298 165 364 185 391 219 351 237 278 232Z" fill="url(#sb-tank)" stroke="#382018" stroke-width="5"/>
-            <path d="M260 198 338 196" stroke="#ffb380" stroke-width="3" opacity=".75"/>
-            <path d="M293 230 318 220 347 241 339 269 301 284 271 263Z" fill="#242424" stroke="#8c847b" stroke-width="7"/>
-            <circle cx="312" cy="253" r="19" fill="#34312e" stroke="#b6a99d" stroke-width="5"/>
-            <circle cx="312" cy="253" r="7" fill="#f46b35"/>
-            <path d="M271 263 245 274 224 273M337 272 377 287 406 283" stroke="#aaa199" stroke-width="9" fill="none"/>
-            <path d="M224 275 211 291 180 291M356 275 386 315 415 315" stroke="#393635" stroke-width="9" fill="none"/>
-            <path d="M182 219 197 204 234 202" stroke="#c4bab0" stroke-width="7" fill="none"/>
-            <path d="M99 217 Q147 190 192 220" stroke="#181818" stroke-width="13" fill="none"/>
-            <path d="M416 220 Q462 196 509 222" stroke="#181818" stroke-width="12" fill="none"/>
-            <path d="M211 207 191 190 140 191" stroke="#232323" stroke-width="15" fill="none"/>
-            <path d="M389 164 392 142" stroke="#181818" stroke-width="6"/>
-            <rect x="406" y="153" width="29" height="33" rx="11" fill="#f6d5a1" stroke="#b96439" stroke-width="5"/>
-            <path d="M435 163 499 154" stroke="#ffb66d" stroke-width="6" opacity=".65" class="auth-bike-headlight"/>
-            <path d="M172 213 134 212" stroke="#d24d26" stroke-width="8"/>
-          </g>
+          <ellipse cx="260" cy="526" rx="111" ry="17" fill="#0c0e10" opacity=".65"/>
+          <!-- Rear tyre and mechanical frame -->
+          <path d="M227 347 Q218 390 217 475 Q220 535 260 540 Q300 535 303 475 Q302 390 293 347Z" fill="#0b0c0d" stroke="#34312d" stroke-width="8"/>
+          <path d="M244 390 V522M276 390 V522" stroke="#524b44" stroke-width="4" stroke-dasharray="12 10"/>
+          <path d="M221 340 182 444 201 463M299 340 338 444 319 463" fill="none" stroke="url(#bike-metal)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M182 443 161 482 192 489M338 443 359 482 328 489" fill="none" stroke="#5a5651" stroke-width="14" stroke-linecap="round"/>
+          <!-- Exhaust pipes -->
+          <path d="M195 395 Q166 407 168 457 L158 477 Q165 492 185 486 L194 462Z" fill="#4c4843" stroke="#b3a9a0" stroke-width="5"/>
+          <path d="M325 395 Q354 407 352 457 L362 477 Q355 492 335 486 L326 462Z" fill="#4c4843" stroke="#b3a9a0" stroke-width="5"/>
+          <rect x="157" y="475" width="31" height="12" rx="6" fill="#181819"/>
+          <rect x="332" y="475" width="31" height="12" rx="6" fill="#181819"/>
+          <!-- Rear fairing, tail light and number plate -->
+          <path d="M204 311 Q222 290 260 288 Q298 290 316 311 L328 379 Q304 409 260 414 Q216 409 192 379Z" fill="url(#bike-body)" stroke="#522e20" stroke-width="8"/>
+          <path d="M224 354 Q260 373 296 354 L290 382 Q260 397 230 382Z" fill="#6f201b" stroke="#260f0e" stroke-width="4"/>
+          <path class="auth-ride-tail-light" d="M231 360 Q260 371 289 360" fill="none" stroke="#ff4940" stroke-width="10" stroke-linecap="round"/>
+          <rect x="228" y="414" width="64" height="27" rx="4" fill="#e8ded0" stroke="#484644" stroke-width="5"/>
+          <rect x="235" y="423" width="50" height="7" rx="3" fill="#4a4947" opacity=".7"/>
+          <!-- Handlebar and side mirrors -->
+          <path d="M209 257 145 236 115 208M311 257 375 236 405 208" fill="none" stroke="#272829" stroke-width="17" stroke-linecap="round"/>
+          <path d="M121 213 106 173M399 213 414 173" fill="none" stroke="#a6a09a" stroke-width="6" stroke-linecap="round"/>
+          <ellipse cx="101" cy="166" rx="27" ry="14" fill="#242526" stroke="#98928b" stroke-width="6" transform="rotate(16 101 166)"/>
+          <ellipse cx="419" cy="166" rx="27" ry="14" fill="#242526" stroke="#98928b" stroke-width="6" transform="rotate(-16 419 166)"/>
+          <!-- Rider: helmet, back, hands and legs -->
+          <path d="M222 283 177 340 162 425" fill="none" stroke="#151718" stroke-width="37" stroke-linecap="round"/>
+          <path d="M298 283 343 340 358 425" fill="none" stroke="#151718" stroke-width="37" stroke-linecap="round"/>
+          <path d="M205 289 170 385M315 289 350 385" fill="none" stroke="#55514c" stroke-width="9" stroke-linecap="round"/>
+          <path d="M232 156 Q260 144 288 156 Q328 177 337 217 L320 329 Q260 347 200 329 L183 217 Q192 177 232 156Z" fill="url(#rider-jacket)" stroke="#0d0f11" stroke-width="11"/>
+          <path d="M260 181 V318" stroke="#666561" stroke-width="5" opacity=".65"/>
+          <path d="M221 200 Q260 221 299 200" fill="none" stroke="#77716a" stroke-width="5" opacity=".5"/>
+          <path d="M194 197 154 248 132 233M326 197 366 248 388 233" fill="none" stroke="#1c1e20" stroke-width="35" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M137 236 122 218M383 236 398 218" stroke="#0c0d0d" stroke-width="19" stroke-linecap="round"/>
+          <path d="M260 77 C211 77 198 108 200 148 Q202 182 225 194 L295 194 Q318 182 320 148 C322 108 309 77 260 77Z" fill="#242527" stroke="#868078" stroke-width="8"/>
+          <path d="M224 108 Q260 93 296 108 L307 137 Q260 155 213 137Z" fill="#3c4145" stroke="#aaa397" stroke-width="5"/>
+          <path d="M225 159 Q260 170 295 159" stroke="#e97a3d" stroke-width="7" stroke-linecap="round"/>
+          <path d="M242 85 Q260 77 278 85" stroke="#a6a096" stroke-width="3" fill="none"/>
         </svg>
         <div class="auth-ride-ground-label"><span>NO SHORTCUTS</span><span>JUST THE RIDE →</span></div>
       </div>
