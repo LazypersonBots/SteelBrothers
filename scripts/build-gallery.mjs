@@ -82,7 +82,7 @@ export async function buildGallery() {
   await mkdir(join(output, 'signin'), { recursive: true });
   await mkdir(join(output, 'photos'), { recursive: true });
 
-  for (const file of ['index.html', 'styles.css', 'gallery.js', 'activity.js', 'activity-data.json', 'signin.js', 'auth.css', 'steel-brothers-logo.avif', '_headers']) {
+  for (const file of ['index.html', 'styles.css', 'gallery.js', 'activity.js', 'activity-data.json', 'signin.js', 'ride-motion.js', 'auth.css', 'steel-brothers-logo.avif', '_headers']) {
     await cp(join(root, file), join(output, file));
   }
   await cp(join(root, 'gallery', 'index.html'), join(output, 'gallery', 'index.html'));
