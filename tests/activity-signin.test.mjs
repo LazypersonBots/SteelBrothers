@@ -85,87 +85,25 @@ test('signin demo has required email, nickname and password, no fake email verif
   assert.doesNotMatch(page,/<form[^>]+action=/);
 });
 
-test('sign-in has original kinetic road and speedometer, no static hero picture', async () => {
-  const page = await read('signin/index.html');
-  const css = await read('auth.css');
-  const js = await read('ride-motion.js');
-  assert.match(page, /class="auth-drive-road-dashes"/);
-  assert.match(page, /class="auth-drive-streaks"/);
-  assert.match(page, /class="auth-drive-dial"/);
-  assert.match(page, /id="auth-drive-speed"/);
-  assert.match(page, /id="auth-drive-toggle"[^>]*aria-pressed="false"/);
-  assert.match(page, /src="\/ride-motion\.js"/);
-  assert.match(page, /JEDNA CESTA\./);
-  assert.match(css, /@keyframes auth-drive-lanes/);
-  assert.match(css, /@keyframes auth-drive-streak/);
-  assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
-  assert.match(css, /\.auth-page \[hidden\]\{display:none!important\}/);
-  assert.match(js, /requestAnimationFrame/);
-  assert.match(js, /matchMedia/);
-  assert.doesNotMatch(page, /auth-club-photo|auth-photo-scene|auth-ride-bike|<img class="auth-/);
-  assert.doesNotMatch(css, /auth-photo-push|auth-club-photo|auth-motor-idle/);
+test('all four pages use the official PNG favicon, never SB letter artwork', async () => {
+  const pages = ['index.html', 'gallery/index.html', 'activity/index.html', 'signin/index.html'];
+  for (const path of pages) {
+    const html = await read(path);
+    assert.match(html, /<link rel="icon" href="\/favicon\.png" type="image\/png" sizes="64x64">/);
+    assert.doesNotMatch(html, /data:image\/svg\+xml|%3ESB%3C/);
+  }
 });
 
-test('motion controller animates speed and needle, pauses, resumes and respects reduced motion', async () => {
-  const script = await read('ride-motion.js');
-  const animations = new Map();
-  const elements = new Map();
-  const listeners = new Map();
-  let frameId = 0;
-  let reducedChange = null;
-  const media = {matches:false, addEventListener(name, fn){if(name==='change') reducedChange=fn;}};
-  function elem(name) {
-    const item = {
-      name, textContent:'', disabled:false, style:{}, attributes:{},
-      classList:{paused:false,toggle(key,value){ if(key==='motion-paused') this.paused=value; }},
-      addEventListener(name,fn){listeners.set(item.name + ':' + name,fn);},
-      setAttribute(key,value){this.attributes[key]=value;}
-    };
-    elements.set(name,item);
-    return item;
-  }
-  elem('stage');elem('speed');elem('needle');elem('arc');elem('toggle');
-  const doc = {
-    hidden:false,
-    querySelector(selector){return elements.get(selector.includes('dial-glow') ? 'arc' : 'stage');},
-    getElementById(id){return elements.get({
-      'auth-drive-speed':'speed','auth-drive-needle':'needle','auth-drive-toggle':'toggle'
-    }[id]);},
-    addEventListener(name,fn){listeners.set('document:' + name,fn);}
-  };
-  const win = {
-    matchMedia:()=>media,
-    requestAnimationFrame(fn){animations.set(++frameId,fn);return frameId;},
-    cancelAnimationFrame(id){animations.delete(id);}
-  };
-  runInNewContext(script,{document:doc,window:win});
-  assert.equal(elements.get('speed').textContent,'082');
-  assert.equal(animations.size,1);
-  const [firstId,first] = animations.entries().next().value;
-  animations.delete(firstId);
-  first(1000);
-  assert.match(elements.get('speed').textContent,/^\d{3}$/);
-  assert.match(elements.get('needle').style.transform,/^rotate\(/);
-  assert.equal(animations.size,1);
-  listeners.get('toggle:click')();
-  assert.equal(elements.get('stage').classList.paused,true);
-  assert.equal(elements.get('toggle').textContent,'SPUSTIT ANIMACI');
-  assert.equal(animations.size,0);
-  listeners.get('toggle:click')();
-  assert.equal(elements.get('stage').classList.paused,false);
-  assert.equal(animations.size,1);
-  media.matches=true;
-  reducedChange();
-  assert.equal(animations.size,0);
-  assert.equal(elements.get('toggle').disabled,true);
-  assert.equal(elements.get('speed').textContent,'082');
-  media.matches=false;
-  reducedChange();
-  assert.equal(elements.get('toggle').disabled,false);
-  assert.equal(animations.size,1);
-  doc.hidden=true;
-  listeners.get('document:visibilitychange')();
-  assert.equal(animations.size,0);
+test('sign-in visual is minimal, with logo and one subtle CSS-only accent', async () => {
+  const html = await read('signin/index.html');
+  const css = await read('auth.css');
+  assert.match(html, /class="auth-simple-logo" src="\/steel-brothers-logo\.avif"/);
+  assert.match(html, /class="auth-simple-line"/);
+  assert.match(html, /JEDNA CESTA\./);
+  assert.match(css, /@keyframes auth-simple-slide/);
+  assert.match(css, /@media\(prefers-reduced-motion:reduce\)/);
+  assert.doesNotMatch(html, /ride-motion\.js|auth-drive-road|auth-drive-dial|auth-drive-needle/);
+  assert.doesNotMatch(css, /auth-drive-road|auth-drive-dial|auth-drive-needle/);
 });
 
 test('Netlify and local preview serve both secondary pages', async () => {
@@ -177,7 +115,7 @@ test('Netlify and local preview serve both secondary pages', async () => {
     assert.ok(preview.includes("['/" + slug + "', '" + slug + "/index.html']"));
     assert.ok(build.includes("join(output, '" + slug + "')"));
   }
-  for (const name of ['activity.js','activity-data.json','signin.js','ride-motion.js','auth.css']) {
+  for (const name of ['activity.js','activity-data.json','signin.js','auth.css','favicon.png']) {
     assert.ok(build.includes("'" + name + "'"));
   }
 });
