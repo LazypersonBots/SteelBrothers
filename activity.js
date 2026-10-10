@@ -4,10 +4,11 @@
   if (!container) return;
   const isHome = container.dataset.activityList === 'home';
   const next = document.querySelector('[data-next-event]');
-  const dateFormat = new Intl.DateTimeFormat('cs-CZ', {
-    day: 'numeric', month: 'long', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Prague'
-  });
+  const dateFormat = value => new Intl.DateTimeFormat(
+    window.SteelI18n?.lang === 'en' ? 'en-GB' : 'cs-CZ', {
+      day: 'numeric', month: 'long', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Prague'
+    }).format(new Date(value));
 
   function showMessage(message) {
     const p = document.createElement('p');
@@ -42,7 +43,7 @@
     const date = document.createElement('time');
     date.className = 'activity-date';
     date.dateTime = item.startsAt;
-    date.textContent = dateFormat.format(new Date(item.startsAt));
+    date.textContent = dateFormat(item.startsAt);
     const title = document.createElement('h3');
     title.textContent = item.title;
     const desc = document.createElement('p');
@@ -68,7 +69,7 @@
         .sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt));
       if (next) {
         next.textContent = upcoming.length
-          ? 'NEJBLIŽŠÍ: ' + dateFormat.format(new Date(upcoming[0].startsAt))
+          ? 'NEJBLIŽŠÍ: ' + dateFormat(upcoming[0].startsAt)
           : 'ZATÍM BEZ POTVRZENÉHO TERMÍNU';
       }
       if (!upcoming.length) {
@@ -82,5 +83,6 @@
       if (next) next.textContent = 'TERMÍNY JSOU DOČASNĚ NEDOSTUPNÉ';
     }
   }
+  document.addEventListener?.('sb:language-change',()=>void load());
   void load();
 })();
