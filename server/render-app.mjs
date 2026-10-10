@@ -296,7 +296,7 @@ export function createSteelBrothersServer({
         await sendHttpResponse(res,apiResponse(429,{error:'Počkej chvíli a zkus to znovu.'}));return;
       }
       try{
-        const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname);
+        const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname,url.pathname==='/api/account/avatar'?105000:8192);
         const fields=url.pathname.endsWith('/register')?['email','nickname','password','verificationProof']
           :url.pathname.endsWith('/login')?['email','password']
           :url.pathname.endsWith('/preferences')?['emailOptIn']
