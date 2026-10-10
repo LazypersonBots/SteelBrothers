@@ -29,6 +29,7 @@ jobs:
           test -s dist/signin.js
           test -s dist/email-verification.js
           test -s dist/announcements.js
+          test -s dist/club-admin.js
           test -s dist/announcements.css
           test -s dist/index.html
           test -s dist/gallery.js
