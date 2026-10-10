@@ -104,13 +104,13 @@ export function apiResponse(status, data) {
   });
 }
 
-export async function readEmailPayload(request, fields) {
+export async function readEmailPayload(request, fields, allowedOrigins = ['https://steelbrothers.cz', 'https://www.steelbrothers.cz']) {
   if (request.method !== 'POST') return { error: apiResponse(405, { error: 'Method not allowed' }) };
   if (!request.headers.get('content-type')?.toLowerCase().startsWith('application/json')) {
     return { error: apiResponse(415, { error: 'Expected application/json' }) };
   }
   const origin = request.headers.get('origin');
-  if (origin !== 'https://steelbrothers.cz' && origin !== 'https://www.steelbrothers.cz') {
+  if (!allowedOrigins.includes(origin)) {
     return { error: apiResponse(403, { error: 'Origin not allowed' }) };
   }
   try {
