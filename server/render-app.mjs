@@ -7,7 +7,6 @@ import { renderVerificationEmail } from './email-template.mjs';
 import { createVerificationMemoryStore } from './render-memory-store.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
-const siteRoot = resolve(dist);
 const routes = new Map([
   ['/', 'index.html'], ['/index.html', 'index.html'],
   ['/gallery', 'gallery/index.html'], ['/gallery/', 'gallery/index.html'],
@@ -81,9 +80,11 @@ export function createSteelBrothersServer({
   env = process.env,
   fetchEmail = fetch,
   store = createVerificationMemoryStore(),
+  staticRoot = dist,
   now = Date.now,
   log = console
 } = {}) {
+  const siteRoot = resolve(staticRoot);
   const isRender = env.RENDER === 'true' && env.IS_PULL_REQUEST !== 'true';
   const allowedOrigins = ['https://steelbrothers.cz', 'https://www.steelbrothers.cz'];
   if (isRender && typeof env.RENDER_EXTERNAL_URL === 'string' &&
