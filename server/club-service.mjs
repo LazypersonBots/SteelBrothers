@@ -112,7 +112,7 @@ export function createClubService({db,secret,sendCodeEmail,sendClubEmail,now=Dat
        return fail(403,'Ověření e-mailu vypršelo. Pošli nový kód.');
      const exists=(await q('SELECT id FROM sb_members WHERE email=$1',[email])).rows[0];
      if(exists)return fail(409,'Tento e-mail už má účet. Přihlas se.');
-     const created=(await q('INSERT INTO sb_members(email,nickname,password_hash,email_opt_in) VALUES($1,$2,$3,FALSE) RETURNING id,email,nickname,email_opt_in,verified_at',
+     const created=(await q('INSERT INTO sb_members(email,nickname,password_hash,email_opt_in) VALUES($1,$2,$3,TRUE) RETURNING id,email,nickname,email_opt_in,verified_at',
        [email,nickname,hash])).rows[0];
      created.email_verified=true;
      await q("UPDATE sb_email_verifications SET state='consumed',proof_hash=NULL WHERE email=$1",[email]);
