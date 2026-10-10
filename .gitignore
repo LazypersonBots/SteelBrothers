@@ -6,3 +6,6 @@ node_modules/
 
 dist/
 .netlify/
+
+# Local Neon project link and credentials
+.neon/
