@@ -24,6 +24,8 @@ jobs:
           test -s dist/activity/index.html
           test -s dist/signin/index.html
           test -s dist/activity-data.json
+          test -s dist/club-content.json
+          test -s dist/club-content.js
           test -s dist/activity.js
           test -s dist/auth.css
           test -s dist/signin.js
