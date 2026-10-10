@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="/gallery.js" defer></script>
   <script src="/activity.js" defer></script>
+  <script src="/language.js" defer></script>
   <script src="/club-content.js" defer></script>
   <link rel="stylesheet" href="/announcements.css">
   <script src="/announcements.js" defer></script>
@@ -27,8 +28,8 @@
 <body>
   <header class="header">
     <a class="brand" href="#home" aria-label="Steel Brothers — úvod"><img class="brand-logo" src="steel-brothers-logo.avif" alt="" width="52" height="52"><span>STEEL<br>BROTHERS</span></a>
-    <nav aria-label="Hlavní navigace"><a href="#club">O klubu</a><a href="/activity/">Aktivity</a><a href="/gallery/">Galerie</a></nav>
-    <a class="header-action" href="/signin/">PŘIDAT SE</a>
+    <nav aria-label="Hlavní navigace"><a href="#club">O klubu / About</a><a href="/history/">Historie / History</a><a href="/activity/">Akce / Events</a><a href="/gallery/">Galerie / Media</a></nav>
+    <a class="header-action" href="/signin/">PŘIDAT SE / JOIN</a>
   </header>
 
   <main>
@@ -50,11 +51,7 @@
     <section class="section about" id="club" aria-labelledby="club-title">
       <div><p class="eyebrow accent"> / O KLUBU</p><h2 id="club-title">VÍC NEŽ STROJE.<br>LIDI ZA ŘÍDÍTKY.</h2><p class="section-note">KAŽDÝ SVÝM STYLEM. SPOLEČNĚ STEJNÝM SMĚREM.</p></div>
       <div class="about-copy"><p class="lead">Někdy stačí plná nádrž,<br>volná sobota a dobrá parta.</p><p>Steel Brothers spojuje chuť vyrazit ven, objevovat nové silnice a užít si cestu společně. Nezáleží na značce motorky. Důležitý je respekt a to, že se na sebe můžeme spolehnout.</p><div class="values"><article><h3>Držíme při sobě.</h3><p>Na cestě i při zastávkách. Na každého se počká.</p></article><article><h3>Jezdíme pro radost.</h3><p>Dobré zatáčky, společné kafe a žádný zbytečný spěch.</p></article></div>
-        <details class="club-history" id="history">
-          <summary><span>HISTORIE KLUBU</span><span aria-hidden="true">+</span></summary>
-          <p data-club-history>Oficiální historii klubu zveřejníme až po schválení podkladů klubem.</p>
-          <div class="club-chapters" data-club-chapters hidden><h3>Oficiální chapters</h3></div>
-        </details>
+        <a class="club-history-link" href="/history/">POZNAT NAŠI HISTORII / EXPLORE OUR HISTORY <span aria-hidden="true">↗</span></a>
       </div>
     </section>
 
@@ -86,13 +83,29 @@
       </div>
     </section>
 
+    <section class="section club-house" id="clubhouse" aria-labelledby="clubhouse-title">
+      <div class="section-top"><div><p class="eyebrow accent"> / CLUB HOUSE / KLUBOVNA</p><h2 id="clubhouse-title">NAŠE KLUBOVNA.<br>CLUB HOUSE.</h2></div><p class="muted">Místo pro společné chvíle.<br>A place to get together.</p></div>
+      <div class="clubhouse-layout">
+        <div class="clubhouse-photos">
+          <figure><a href="/photos/2026-10-04-170046-klubovna.webp" target="_blank" rel="noopener noreferrer"><img src="/photos/2026-10-04-170046-klubovna.webp" loading="lazy" width="800" height="600" alt="Fotografie klubovny Steel Brothers / Steel Brothers club house"></a><figcaption>KLUBOVNA / CLUB HOUSE</figcaption></figure>
+          <figure><a href="/photos/2026-10-04-181746-klubovy-bar.webp" target="_blank" rel="noopener noreferrer"><img src="/photos/2026-10-04-181746-klubovy-bar.webp" loading="lazy" width="800" height="600" alt="Fotografie klubového baru / Club bar photo"></a><figcaption>KLUBOVÝ BAR / CLUB BAR</figcaption></figure>
+        </div>
+        <aside class="clubhouse-details" aria-labelledby="clubhouse-hours-title">
+          <p class="eyebrow accent"> / OPENING HOURS / OTEVÍRACÍ DOBA</p>
+          <h3 id="clubhouse-hours-title">KDY MÁME OTEVŘENO? / WHEN ARE WE OPEN?</h3>
+          <div data-club-hours aria-live="polite">Otevírací doba zatím není oficiálně potvrzena. / Opening hours have not been confirmed yet.</div>
+          <p class="club-public-note">Přístup a veřejné akce budou upřesněny klubem. / Access and public events will be confirmed by the club.</p>
+        </aside>
+      </div>
+    </section>
+
     <section class="section club-public-info" id="support" aria-labelledby="support-title">
       <div class="club-public-panel">
-        <p class="eyebrow accent"> / SUPPORT</p>
-        <h2 id="support-title">PODPOŘ<br>NAŠI CESTU.</h2>
-        <p>Prostor pro oficiálně schválený veřejný support merch. Členské insignie ani neveřejné nášivky se zde nenabízejí.</p>
+        <p class="eyebrow accent"> / E-SHOP / MERCH STORE</p>
+        <h2 id="support-title">E-SHOP<br><span class="merch-emphasis">/ MERCH STORE.</span></h2>
+        <p>Podpoř naši cestu oficiálním veřejným merchem. / Support our road with official public merchandise. Členské insignie nejsou na prodej. / Member-only insignia are not for sale.</p>
         <div data-merch-pending>
-          <div class="club-merch-tags" aria-label="Připravované kategorie"><span>SUPPORT TRIČKA</span><span>SAMOLEPKY</span><span>VEŘEJNÉ NÁŠIVKY</span></div>
+          <div class="club-merch-tags" aria-label="Připravované kategorie / Planned categories"><span>TRIČKA / T-SHIRTS</span><span>SAMOLEPKY / STICKERS</span><span>NÁŠIVKY / PATCHES</span></div>
           <p class="club-public-note">Veřejná nabídka se teprve připravuje. Momentálně zde nelze nic objednat.</p>
         </div>
         <div class="club-merch-list" data-merch-list hidden></div>
@@ -103,17 +116,25 @@
         <p>Ověřené veřejné kontaktní údaje a případnou adresu veřejné klubovny zveřejníme, jakmile je klub schválí.</p>
         <div class="club-contact-details" data-public-contact>Oficiální kontaktní údaje zatím nejsou zveřejněny.</div>
       </div>
-    </section>
-
-    <section class="section club-memorial" data-memorials id="in-memory" aria-labelledby="memorial-title" hidden>
-      <p class="eyebrow accent"> / IN MEMORY</p>
-      <h2 id="memorial-title">NAVŽDY SOUČÁSTÍ CESTY.</h2>
-      <div class="club-memorial-list" data-memorial-list></div>
+      <div class="club-public-panel" id="social">
+        <p class="eyebrow accent"> / SOCIAL MEDIA / SOCIÁLNÍ SÍTĚ</p>
+        <h2>SLEDUJ NÁS.<br>FOLLOW US.</h2>
+        <p>Oficiální sociální sítě najdeš zde, jakmile budou potvrzeny klubem. / Approved official social accounts will appear here.</p>
+        <div class="club-social-links" data-club-socials>Odkazy zatím nebyly ověřeny. / Links not yet verified.</div>
+      </div>
+      <section class="club-public-panel club-memorial-panel" data-memorials id="in-memory" aria-labelledby="memorial-title">
+        <p class="eyebrow accent"> / MEMORIAL / VZPOMÍNKA</p>
+        <h2 id="memorial-title">IN MEMORY.<br><span class="memorial-rip">R.I.P.</span></h2>
+        <p>Navždy součástí naší cesty. / Forever part of our journey.</p>
+        <div class="club-memorial-list" data-memorial-list aria-live="polite">
+          <p class="club-public-note" data-memorial-pending>Vzpomínky budou zveřejněny pouze se schválením klubu. / Tributes appear only with club approval.</p>
+        </div>
+      </section>
     </section>
 
     <section class="join section" aria-labelledby="join-title"><div><p class="eyebrow">DALŠÍ KILOMETRY MŮŽEME JET SPOLU.</p><h2 id="join-title">MÁŠ STEJNÝ<br><span>SMĚR?</span></h2></div><div class="join-action"><p>Seznam se s partou.<br>O zbytku si povíme u motorek.</p><a class="join-demo-link" href="/signin/">CHCI SE PŘIDAT</a><small>Registrace s ověřením e-mailu.</small></div></section>
   </main>
-  <footer><a href="#home" class="footer-brand">STEEL BROTHERS<span>MOTORCYCLE CLUB</span></a><nav class="footer-links" aria-label="Další informace"><a href="#history">Historie</a><a href="#support">Support</a><a href="#contact">Kontakt</a></nav><p>Steel Brothers · Motorcycle Club</p><span>© 2026 STEEL BROTHERS</span></footer>
+  <footer><a href="#home" class="footer-brand">STEEL BROTHERS<span>MOTORCYCLE CLUB</span></a><nav class="footer-links" aria-label="Další informace"><a href="/history/">Historie / History</a><a href="#clubhouse">Klubovna / Club House</a><a href="#support">E-shop / Merch</a><a href="#contact">Kontakt / Contact</a><a href="#social">Sítě / Social</a></nav><p>Steel Brothers · Motorcycle Club</p><span>© 2026 STEEL BROTHERS</span></footer>
   <button id="sb-bell" type="button" class="sb-bell" aria-label="Oznámení Steel Brothers" aria-haspopup="dialog" aria-expanded="false"><span aria-hidden="true">🔔</span><span class="sb-bell-count" hidden></span></button>
   <div id="sb-notices" class="sb-notice-backdrop" hidden>
     <section class="sb-notice-panel" role="dialog" aria-modal="true" aria-labelledby="sb-notice-title" tabindex="-1">
