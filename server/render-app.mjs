@@ -5,10 +5,12 @@ import { fileURLToPath } from 'node:url';
 import { makeEmailVerification, readyForVerification, readEmailPayload, apiResponse } from './verification.mjs';
 import { renderVerificationEmail } from './email-template.mjs';
 import { createVerificationMemoryStore } from './render-memory-store.mjs';
+import { createClubService } from './club-service.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const routes = new Map([
   ['/', 'index.html'], ['/index.html', 'index.html'],
+  ['/announcements.js', 'announcements.js'], ['/announcements.css', 'announcements.css'],
   ['/gallery', 'gallery/index.html'], ['/gallery/', 'gallery/index.html'],
   ['/gallery/index.html', 'gallery/index.html'],
   ['/activity', 'activity/index.html'], ['/activity/', 'activity/index.html'],
@@ -57,7 +59,7 @@ async function toWebRequest(req, url) {
   let length = 0;
   for await (const chunk of req) {
     length += chunk.length;
-    if (length > 2048) {
+    if (length > 8192) {
       const error = new Error('Request too large');
       error.status = 413;
       throw error;
@@ -69,6 +71,8 @@ async function toWebRequest(req, url) {
     headers:req.headers,
     body:Buffer.concat(chunks)
   });
+  server.clubService=clubService;
+  return server;
 }
 
 async function sendHttpResponse(res, webResponse) {
@@ -81,6 +85,7 @@ export function createSteelBrothersServer({
   fetchEmail = fetch,
   store = createVerificationMemoryStore(),
   staticRoot = dist,
+  db = null,
   now = Date.now,
   log = console
 } = {}) {
@@ -124,7 +129,36 @@ export function createSteelBrothersServer({
       })
     : null;
 
-  return createServer(async (req, res) => {
+  const clubService=codeService && db ? createClubService({
+    db,
+    secret:env.STEELBROTHERS_VERIFICATION_SECRET,
+    now,
+    sendCodeEmail:({email,code})=>sendEmail({email,code,id:'club-'+Date.now()+'-'+Math.random()}),
+    async sendClubEmail({email,title,body,id,memberId}) {
+      const escape=value=>String(value).replace(/[&<>"']/g,c=>({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      })[c]);
+      const safeTitle=escape(title),safeBody=escape(body).replace(/\n/g,'<br>');
+      const response=await fetchEmail('https://api.resend.com/emails',{
+        method:'POST',
+        headers:{
+          Authorization:'Bearer '+env.RESEND_API_KEY,
+          'Content-Type':'application/json',
+          'Idempotency-Key':'sb-ann-'+id+'-'+memberId
+        },
+        body:JSON.stringify({
+          from:'Steel Brothers <verification@steelbrothers.cz>',
+          to:[email],
+          subject:'Steel Brothers — '+title,
+          html:'<div style="background:#151515;color:#f1e9e0;padding:26px;font-family:Arial,sans-serif"><h2 style="color:#f46b35">STEEL BROTHERS</h2><h3>'+safeTitle+'</h3><p>'+safeBody+'</p><p style="color:#aaa;font-size:12px">Klubová oznámení · Pro vypnutí e-mailů otevři svůj profil na steelbrothers.cz.</p></div>',
+          text:'STEEL BROTHERS\n'+title+'\n\n'+body+'\n\nOznámení z klubu Steel Brothers. Přepnutí odběru najdeš po přihlášení.'
+        }),
+        signal:AbortSignal.timeout(12000)
+      });
+      if(!response.ok)throw Error('Club email provider error: '+response.status);
+    }
+  }):null;
+  const server=createServer(async (req, res) => {
     res.setHeader('X-Robots-Tag','noindex, nofollow, noimageindex');
     res.setHeader('X-Content-Type-Options','nosniff');
     res.setHeader('Referrer-Policy','no-referrer');
@@ -143,7 +177,7 @@ export function createSteelBrothersServer({
     if (url.pathname === '/api/email/send' || url.pathname === '/api/email/verify') {
       const isSend = url.pathname === '/api/email/send';
       if (isSend && req.method === 'GET') {
-        await sendHttpResponse(res, apiResponse(200, { available:!!codeService, accountCreation:false }));
+        await sendHttpResponse(res, apiResponse(200, { available:!!codeService, accountCreation:!!clubService }));
         return;
       }
       if (req.method !== 'POST') {
@@ -167,17 +201,79 @@ export function createSteelBrothersServer({
         const request = await toWebRequest(req, 'https://steelbrothers.cz' + url.pathname);
         const { data, error } = await readEmailPayload(request, isSend ? ['email'] : ['email','code'], allowedOrigins);
         if (error) { await sendHttpResponse(res,error);return; }
-        const result = isSend
-          ? await codeService.send(data.email)
-          : await codeService.verify(data.email,data.code);
+        const result = clubService
+          ? (isSend ? await clubService.sendCode(data.email) : await clubService.verifyCode(data.email,data.code))
+          : (isSend ? await codeService.send(data.email) : await codeService.verify(data.email,data.code));
         await sendHttpResponse(res, apiResponse(result.status, result.status === 200
-          ? { message:result.message, ...(result.verified ? { verified:true } : {}) }
+          ? { message:result.message, ...(result.verified ? { verified:true, ...(result.verificationProof ? {verificationProof:result.verificationProof} : {}) } : {}) }
           : { error:result.message }));
       } catch (err) {
         log.error('Email verification endpoint error:', err?.name || 'unknown');
         await sendHttpResponse(res, apiResponse(err?.status === 413 ? 413 : 503, {
           error:err?.status === 413 ? 'Request too large' : 'Ověřování je dočasně nedostupné.'
         }));
+      }
+      return;
+    }
+
+    if(url.pathname==='/api/account/status' && req.method==='GET') {
+      await sendHttpResponse(res,apiResponse(200,{available:!!clubService}));return;
+    }
+    if(url.pathname==='/api/account/me' && req.method==='GET') {
+      const member=clubService?await clubService.current(req.headers.cookie):null;
+      await sendHttpResponse(res,apiResponse(200,{member:member?{
+        email:member.email,nickname:member.nickname,emailOptIn:member.email_opt_in,
+        isAdmin:member.email==='gamedriverstudio@gmail.com'||member.email==='steel.brothersmed@gmail.com'
+      }:null}));return;
+    }
+    if(url.pathname==='/api/announcements' && req.method==='GET') {
+      try {
+        await sendHttpResponse(res,apiResponse(200,clubService
+          ? { ...(await clubService.listAnnouncements()),available:true }
+          : {announcements:[],available:false}));
+      } catch { await sendHttpResponse(res,apiResponse(503,{error:'Oznámení nejsou dostupná.'})); }
+      return;
+    }
+    if(['/api/account/register','/api/account/login','/api/account/logout','/api/account/preferences','/api/announcements'].includes(url.pathname)) {
+      if(req.method!=='POST'){await sendHttpResponse(res,apiResponse(405,{error:'Method not allowed'}));return;}
+      if(!clubService){await sendHttpResponse(res,apiResponse(503,{error:'Účty čekají na připojení databáze Neon.'}));return;}
+      const address=(req.headers['x-forwarded-for']||req.socket.remoteAddress||'unknown').toString().split(',')[0].trim().slice(0,70);
+      const frequency=url.pathname==='/api/account/login'?10:5;
+      if(rateLimit('members:'+url.pathname+':'+address,frequency,60_000)){
+        await sendHttpResponse(res,apiResponse(429,{error:'Počkej chvíli a zkus to znovu.'}));return;
+      }
+      try{
+        const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname);
+        const fields=url.pathname.endsWith('/register')?['email','nickname','password','verificationProof','emailOptIn']
+          :url.pathname.endsWith('/login')?['email','password']
+          :url.pathname.endsWith('/preferences')?['emailOptIn']
+          :url.pathname==='/api/announcements'?['title','body','emailEveryone']:[];
+        const {data,error}=await readEmailPayload(request,fields,allowedOrigins,
+          url.pathname==='/api/announcements'?8192:2048);
+        if(error){await sendHttpResponse(res,error);return;}
+        const member=await clubService.current(req.headers.cookie);
+        let action;
+        if(url.pathname.endsWith('/register'))action=await clubService.register(data);
+        else if(url.pathname.endsWith('/login'))action=await clubService.login(data);
+        else if(url.pathname.endsWith('/logout'))action=await clubService.logout(req.headers.cookie);
+        else if(url.pathname.endsWith('/preferences')){
+          if(!member)action={status:401,error:'Přihlas se.'};
+          else if(typeof data.emailOptIn!=='boolean')action={status:400,error:'Neplatná volba.'};
+          else {
+            await db.query('UPDATE sb_members SET email_opt_in=$1 WHERE id=$2',[data.emailOptIn,member.id]);
+            action={status:200,message:'Nastavení uloženo.'};
+          }
+        } else action=await clubService.publish(data,member);
+        const {setCookie,status,...body}=action;
+        const response=apiResponse(status,body);
+        if(setCookie)response.headers.set('Set-Cookie',setCookie);
+        await sendHttpResponse(res,response);
+        if(status===201&&url.pathname==='/api/announcements'&&action.emailsQueued){
+          setImmediate(()=>clubService.sendPending(25).catch(()=>{}));
+        }
+      } catch(e) {
+        log.error('Steel Brothers account request failed:',e?.code||e?.name||'unknown');
+        await sendHttpResponse(res,apiResponse(e?.status===413?413:503,{error:'Služba je dočasně nedostupná.'}));
       }
       return;
     }
