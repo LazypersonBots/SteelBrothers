@@ -163,6 +163,16 @@ export function createClubService({db,secret,sendCodeEmail,sendClubEmail,now=Dat
    });
    return result(201,{announcement:created,emailsQueued:notify});
  }
+ async function deleteAnnouncement(id,member){
+   if(!member||!ADMIN_EMAILS.has(member.email)||member.email_verified!==true||!member.verified_at)
+     return fail(403,'Oznámení mohou mazat pouze ověření správci klubu.');
+   if(typeof id!=='string'||!/^[1-9]\\d{0,18}$/.test(id)||BigInt(id)>9223372036854775807n)
+     return fail(400,'Neplatné ID oznámení.');
+   // Database cascade removes related email delivery rows too.
+   const deleted=await db.query('DELETE FROM sb_announcements WHERE id=$1 RETURNING id',[id]);
+   if(!deleted.rows.length)return fail(404,'Oznámení už neexistuje.');
+   return result(200,{deleted:true});
+ }
  async function sendPending(limit=25) {
    let delivered=0;
    for(let i=0;i<limit;i++){
@@ -198,5 +208,5 @@ export function createClubService({db,secret,sendCodeEmail,sendClubEmail,now=Dat
    await db.query('UPDATE sb_members SET avatar_data=$1 WHERE id=$2',[avatarData,member.id]);
    return result(200,{avatarData});
  }
- return {sendCode,verifyCode,register,login,current,logout,listAnnouncements,publish,sendPending,updateAvatar};
+ return {sendCode,verifyCode,register,login,current,logout,listAnnouncements,publish,deleteAnnouncement,sendPending,updateAvatar};
 }
