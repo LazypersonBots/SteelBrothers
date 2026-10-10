@@ -3,6 +3,11 @@
  'use strict';
  const translations={
  "PŘIDAT SE / JOIN": "PŘIDAT SE / JOIN",
+ "Steel Brothers spojuje chuť vyrazit ven, objevovat nové silnice a užít si cestu společně. Důležitý je respekt a to, že se na sebe můžeme spolehnout.": "Steel Brothers is about exploring new roads and enjoying the ride together. Respect and being able to count on each other matter most.",
+ "Otevřít fotografii: ": "Open photo: ",
+ "Smazat oznámení: ": "Delete announcement: ",
+ "Steel Brothers — Jedna cesta. Jedna parta.": "Steel Brothers — One Road. One Crew.",
+ "Steel Brothers — motorkářský klub. Společné vyjížďky, dobrá parta a respekt na cestě.": "Steel Brothers motorcycle club. Shared rides, good company and respect on the road.",
  "O klubu": "About the club",
  "O klubu / About": "O klubu / About",
  "Historie / History": "Historie / History",
@@ -228,7 +233,13 @@
  try {if(localStorage.getItem('sb-language')==='en')language='en';}catch{}
  const originalText=new WeakMap(), originalAttrs=new WeakMap();
  const attributes=['placeholder','aria-label','title','alt'];
- const t=value=>language==='en'?(translations[value]||value):value;
+ const t=value=>{
+   if(language!=='en')return value;
+   if(Object.hasOwn(translations,value))return translations[value];
+   for(const prefix of ['Otevřít fotografii: ','Smazat oznámení: '])
+     if(value.startsWith(prefix))return translations[prefix]+value.slice(prefix.length);
+   return value;
+ };
  function translateText(node) {
    const input=node.nodeValue;
    if(!input||!input.trim())return;
