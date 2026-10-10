@@ -42,7 +42,7 @@ function memoryDB() {
     if(sql.startsWith('INSERT INTO sb_sessions')){
       sessions.set(p[0],{memberId:p[1],expiresAt:p[2]});return {rows:[]};
     }
-    if(sql.startsWith('SELECT m.id,m.email,m.nickname,m.email_opt_in,m.verified_at,EXISTS')){
+    if(sql.startsWith('SELECT m.id,m.email,m.nickname,m.email_opt_in,m.avatar_data,m.verified_at,EXISTS')){
       const session=sessions.get(p[0]);
       const member=[...members.values()].find(x=>x.id===session?.memberId);
       return {rows:member?[{...member,email_verified:(verification.get(member.email)?.verification_count||0)>0}]:[]};
