@@ -1,5 +1,5 @@
 {
-  "_notes": "Only publish approved club information. Empty arrays and null fields never produce invented people, chapters, events or products.",
+  "_notes": "Publish only club-approved details. For bilingual official texts use ...En fields. clubhouse.openingHours is a public, verified list of {day, hours, dayEn, hoursEn} entries, not guessed opening times. No credentials, fictional people, contacts, hours, socials or products.",
   "history": null,
   "chapters": [],
   "videos": [],
@@ -10,5 +10,11 @@
     "address": null,
     "publicClubhouse": null
   },
-  "memorials": []
+  "memorials": [],
+  "historyEn": null,
+  "clubhouse": {
+    "openingHours": null,
+    "publicAccess": null
+  },
+  "socials": []
 }
