@@ -22,7 +22,7 @@ const routes = new Map([
   ['/signin', 'signin/index.html'], ['/signin/', 'signin/index.html'],
   ['/signin/index.html', 'signin/index.html'],
   ['/gallery-data.json', 'gallery-data.json'],
-  ['/activity-data.json', 'activity-data.json'],
+  ['/activity-data.json', 'activity-data.json'], ['/club-content.json', 'club-content.json'], ['/club-content.js', 'club-content.js'],
   ['/gallery.js', 'gallery.js'], ['/activity.js', 'activity.js'],
   ['/signin.js', 'signin.js'], ['/email-verification.js', 'email-verification.js'],
   ['/styles.css', 'styles.css'], ['/auth.css', 'auth.css'],
