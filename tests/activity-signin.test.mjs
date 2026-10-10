@@ -5,58 +5,62 @@ import { runInNewContext } from 'node:vm';
 
 const read = path => readFile(new URL('../' + path, import.meta.url), 'utf8');
 
-test('activity homepage shows three newest entries; full page shows all', async () => {
+test('an empty calendar shows no invented club events', async () => {
   const dataset = JSON.parse(await read('activity-data.json'));
-  assert.equal(dataset.activities.length, 6);
+  assert.deepEqual(dataset.activities, []);
   const js = await read('activity.js');
-  for (const mode of ['home', 'all']) {
-    const root = {
-      dataset: { activityList: mode },
-      children: [],
-      replaceChildren(...children) { this.children = children; }
-    };
-    function element(name) {
-      return {
-        tagName: name,
-        children: [],
-        className: '',
-        textContent: '',
-        append(...children) { this.children.push(...children); }
-      };
+  const root = { dataset:{activityList:'home'}, children:[],
+    replaceChildren(...children){this.children=children;} };
+  const next = {textContent:''};
+  const document = {
+    querySelector(selector) {
+      return selector==='[data-activity-list]'?root:
+        selector==='[data-next-event]'?next:null;
+    },
+    createElement(tag) {
+      return {tag,children:[],textContent:'',append(...children){this.children.push(...children);}};
     }
-    const document = {
-      querySelector(selector) { return selector === '[data-activity-list]' ? root : null; },
-      createElement: element
-    };
-    runInNewContext(js, {
-      document,
-      fetch: async () => ({ ok: true, json: async () => dataset }),
-      console,
-      Date
-    });
-    await new Promise(resolve => setImmediate(resolve));
-    assert.equal(root.children.length, mode === 'home' ? 3 : 6);
-    assert.equal(root.children[0].children[1].textContent, 'Sobota na vedlejších silnicích');
-  }
+  };
+  runInNewContext(js,{document,fetch:async()=>({ok:true,json:async()=>dataset}),console,Date,Intl});
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(root.children.length,1);
+  assert.match(root.children[0].textContent,/Zatím nejsou zveřejněné žádné potvrzené akce/);
+  assert.match(next.textContent,/BEZ POTVRZENÉHO/);
 });
 
-test('activity real dated entries sort ahead of placeholders', async () => {
+test('calendar displays only approved future public events in nearest-first order', async () => {
   const source = await read('activity.js');
-  const mockData = { activities: [
-    { title:'Placeholder', category:'Other', description:'Pending', status:'Brzy', publishedAt:null },
-    { title:'Newest', category:'Ride', description:'Ready', status:'Info', publishedAt:'2026-10-09T17:00:00Z' },
-    { title:'Older', category:'Ride', description:'Ready', status:'Info', publishedAt:'2026-10-08T17:00:00Z' },
-    { title:'Middle', category:'Ride', description:'Ready', status:'Info', publishedAt:'2026-10-08T18:00:00Z' }
-  ] };
-  const root = { dataset: { activityList:'home' }, children:[], replaceChildren(...args){ this.children=args; }};
-  const document = {
-    querySelector(){return root},
-    createElement(tag){return {tag,children:[],append(...args){this.children.push(...args)}}}
-  };
-  runInNewContext(source,{document,fetch:async()=>({ok:true,json:async()=>mockData}),console,Date});
-  await new Promise(resolve=>setImmediate(resolve));
-  assert.deepEqual(root.children.map(c=>c.children[1].textContent),
-    ['Newest','Middle','Older']);
+  const event = (title,startsAt) => ({
+    title,startsAt,category:'Vyjížďka',description:'Potvrzeno klubem',
+    confirmed:true,visibility:'public'
+  });
+  const mockData = { activities:[
+    event('Distant','2099-06-20T10:00:00+02:00'),
+    event('Nearest','2099-01-02T10:00:00+01:00'),
+    event('Fourth','2099-04-20T10:00:00+02:00'),
+    event('Middle','2099-03-20T10:00:00+01:00'),
+    {...event('Private','2099-01-01T10:00:00+01:00'),visibility:'members'},
+    {...event('Draft','2099-01-01T10:00:00+01:00'),confirmed:false},
+    {...event('Past','2020-01-01T10:00:00+01:00')}
+  ]};
+  const roots=[];
+  const script=source;
+  for(const mode of ['home','all']){
+    const root={dataset:{activityList:mode},children:[],
+      replaceChildren(...items){this.children=items;}};
+    const document={
+      querySelector(selector){return selector==='[data-activity-list]'?root:null;},
+      createElement(tag){return {tag,textContent:'',children:[],
+        append(...children){this.children.push(...children);}};}
+    };
+    runInNewContext(script,{document,fetch:async()=>({ok:true,json:async()=>mockData}),console,Date,Intl});
+    await new Promise(resolve=>setImmediate(resolve));
+    roots.push(root);
+  }
+  assert.equal(roots[0].children.length,3);
+  assert.equal(roots[1].children.length,4);
+  assert.deepEqual(roots[0].children.map(c=>c.children[2].textContent),
+    ['Nearest','Middle','Fourth']);
 });
 
 test('both activity and gallery have working return and navigation links', async () => {
