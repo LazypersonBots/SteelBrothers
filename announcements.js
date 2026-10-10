@@ -11,12 +11,64 @@
    const d=new Date(value);return Number.isNaN(d.getTime())?''
      :d.toLocaleDateString('cs-CZ',{year:'numeric',month:'long',day:'numeric'});
  };
+
+ function showDeleteForm(card,item){
+   const old=card.querySelector('.sb-notice-delete-form');
+   if(old){old.remove();return;}
+   for(const form of items.querySelectorAll('.sb-notice-delete-form'))form.remove();
+   const form=document.createElement('form');form.className='sb-notice-delete-form';
+   const intro=el('p','Smazat toto oznámení všem? Akci nelze vrátit. Zadej admin heslo.');
+   const label=el('label','Heslo administrace');
+   const field=document.createElement('input');
+   field.type='password';field.required=true;field.minLength=12;field.maxLength=256;field.autocomplete='off';
+   label.append(field);
+   const actions=document.createElement('div');actions.className='sb-notice-delete-actions';
+   const cancel=el('button','ZRUŠIT');cancel.type='button';
+   const submit=el('button','SMAZAT VŠEM');submit.type='submit';submit.className='sb-notice-delete-submit';
+   const error=el('p','');error.className='sb-notice-delete-error';error.setAttribute('role','alert');
+   actions.append(cancel,submit);form.append(intro,label,actions,error);card.append(form);
+   cancel.addEventListener('click',()=>form.remove());
+   form.addEventListener('submit',async event=>{
+     event.preventDefault();if(submit.disabled||!form.reportValidity())return;
+     submit.disabled=true;cancel.disabled=true;error.textContent='';
+     const password=field.value;field.value='';
+     try{
+       const response=await fetch('/api/announcements/delete',{
+         method:'POST',credentials:'same-origin',cache:'no-store',
+         headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({id:String(item.id),password})
+       });
+       const data=await response.json();
+       if(!response.ok)throw Error(data.error||'Smazání se nepodařilo.');
+       const scroll=items.scrollTop;
+       await load();items.scrollTop=scroll;
+     }catch(e){
+       error.textContent=e.message||'Smazání se nepodařilo.';
+       submit.disabled=false;cancel.disabled=false;field.focus();
+     }
+   });
+   field.focus();
+ }
+ function deleteIcon(){
+   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+   for(const [name,value] of Object.entries({viewBox:'0 0 24 24',width:'16',height:'16',
+     fill:'none',stroke:'currentColor','stroke-width':'1.8','stroke-linecap':'round',
+     'stroke-linejoin':'round','aria-hidden':'true'}))svg.setAttribute(name,value);
+   const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+   path.setAttribute('d','M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m5 4v6m4-6v6');
+   svg.append(path);return svg;
+ }
  async function load(){
    items.replaceChildren(el('p','Načítání klubových aktualit…','sb-notice-empty'));
    try{
-     const response=await fetch('/api/announcements',{cache:'no-store'});
+     const [response,adminResponse]=await Promise.all([
+       fetch('/api/announcements',{cache:'no-store'}),
+       fetch('/api/admin/status',{credentials:'same-origin',cache:'no-store'}).catch(()=>null)
+     ]);
      if(!response.ok)throw Error('Temporary error');
      const payload=await response.json();
+     const admin=adminResponse?.ok?await adminResponse.json().catch(()=>null):null;
+     const canDelete=admin?.eligible===true;
      if(!payload.available){
        items.replaceChildren(el('p','Klubová oznámení budou brzy dostupná.','sb-notice-empty'));return;
      }
@@ -25,7 +77,17 @@
      if(!announcements.length)items.append(el('p','Zatím nejsou žádná oznámení. Sleduj nás!','sb-notice-empty'));
      for(const announcement of announcements){
        const card=document.createElement('article');card.className='sb-notice-item';
-       card.append(el('small',dateLabel(announcement.created_at)));
+       const top=document.createElement('div');top.className='sb-notice-item-top';
+       top.append(el('small',dateLabel(announcement.created_at)));
+       if(canDelete){
+         const remove=el('button','');remove.type='button';remove.className='sb-notice-delete';
+         remove.title='Smazat oznámení';
+         remove.setAttribute('aria-label','Smazat oznámení: '+announcement.title);
+         remove.append(deleteIcon());
+         remove.addEventListener('click',()=>showDeleteForm(card,announcement));
+         top.append(remove);
+       }
+       card.append(top);
        card.append(el('h3',announcement.title));
        card.append(el('p',announcement.body));
        items.append(card);
