@@ -192,7 +192,7 @@
     const bell=document.getElementById('sb-bell');
     if(bell)bell.click();
   });
-  document.addEventListener('sb:language-change',()=>{
+  document.addEventListener?.('sb:language-change',()=>{
     if(savedContent)renderEditable(savedContent);
     void loadNews();
   });
