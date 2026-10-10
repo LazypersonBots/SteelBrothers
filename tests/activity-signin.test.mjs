@@ -100,7 +100,7 @@ test('three public pages use shared profile picture dropdown and bell is read-on
  assert.match(profile,/\/api\/account\/preferences/);
  assert.match(profile,/\/api\/account\/logout/);
  assert.match(profile,/\/api\/announcements/);
- assert.match(profile,/member\.isAdmin/);
+ assert.match(profile,/user\.isAdmin/);
  assert.doesNotMatch(bell,/\/api\/admin|sb-admin-compose/);
  assert.doesNotMatch(bell,/innerHTML/);
 });
