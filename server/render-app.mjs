@@ -305,4 +305,6 @@ export function createSteelBrothersServer({
       res.writeHead(404);res.end('Not found');
     }
   });
+  server.clubService=clubService;
+  return server;
 }
