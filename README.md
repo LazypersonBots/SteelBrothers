@@ -77,3 +77,43 @@ reference, with the real Steel Brothers logo and CSS orbital animation.
 
 This page is UI-only. Do not treat it as a real login until a secure server-side
 identity provider, email verification service, and privacy notices are configured.
+
+## Hosting on Render (Node web service)
+
+Use this project's connected GitHub repository and branch `main`.
+
+- Runtime: Node.
+- Region: Frankfurt, EU Central (recommended for Czechia).
+- Root directory: blank.
+- Build command: `npm install && npm run build`.
+- Start command: `npm start`.
+- Health check path: `/health`.
+- Choose Render Free if offered. **Do not select a paid plan by accident.**
+
+The build copies all site pages and gallery photos into `dist/`. The Node
+server serves static pages and handles `/api/email/send` and
+`/api/email/verify` using the existing Resend templates.
+
+Render service environment variables (create under Environment):
+
+- `RESEND_API_KEY`: SteelBrothers Resend account sending key.
+- `STEELBROTHERS_VERIFICATION_SECRET`: at least 32 random characters,
+  generated privately with crypto-random bytes.
+
+These variables are secrets, **never put them in the repository or chat**.
+The `RENDER` and `RENDER_EXTERNAL_URL` variables are supplied by Render.
+Email verification is unavailable until the secrets are configured.
+
+### Temporary email-code storage limitation
+
+To avoid connecting personal Supabase or buying an extra database just for
+short-lived six-digit codes, Render currently uses a bounded in-memory store.
+Codes expire in 10 minutes, have five attempts and a 60-second resend cooldown.
+**Any restart, deployment or sleeping instance clears pending codes.**
+Use a persistent independent store before scaling past one instance or
+requiring guaranteed cross-deployment continuity. This does NOT create real
+member accounts; signup and login remain demos.
+
+Do not switch the steelbrothers.cz DNS until the Render URL, photos, page
+navigation and actual Resend delivery are verified. Existing Netlify deployment
+can stay online during migration.
