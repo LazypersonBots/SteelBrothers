@@ -83,7 +83,7 @@ export async function buildGallery() {
   await mkdir(join(output, 'signin'), { recursive: true });
   await mkdir(join(output, 'photos'), { recursive: true });
 
-  for (const file of ['index.html', 'styles.css', 'gallery.js', 'activity.js', 'activity-data.json', 'club-content.json', 'club-content.js', 'signin.js', 'email-verification.js', 'auth.css', 'announcements.js', 'announcements.css', 'member-profile.js', 'member-profile.css', 'club-admin.js', 'steel-brothers-logo.avif', 'favicon.png', 'robots.txt', '_headers']) {
+  for (const file of ['index.html', 'styles.css', 'gallery.js', 'activity.js', 'activity-data.json', 'club-content.json', 'club-content.js', 'language.js', 'signin.js', 'email-verification.js', 'auth.css', 'announcements.js', 'announcements.css', 'member-profile.js', 'member-profile.css', 'club-admin.js', 'steel-brothers-logo.avif', 'favicon.png', 'robots.txt', '_headers']) {
     await cp(join(root, file), join(output, file));
   }
   await cp(join(root, 'gallery', 'index.html'), join(output, 'gallery', 'index.html'));
