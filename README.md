@@ -49,10 +49,30 @@ Requires Node.js 18+:
 
 The official Steel Brothers logo is included as steel-brothers-logo.avif.
 
-## Search visibility
+## Search visibility — NEVER INDEX THIS SITE
 
-The site keeps existing noindex directives while unfinished. Only remove them
-when the owner explicitly approves search-engine indexing.
+The owner requires **all SteelBrothers pages and media to remain absent from
+Google and other search engines**. Do not remove this policy unless the owner
+explicitly requests it.
+
+- Every HTML page includes both `robots` and `googlebot` meta directives:
+  `noindex, nofollow, noimageindex`.
+- Render and the local preview serve `X-Robots-Tag:
+  noindex, nofollow, noimageindex, nosnippet` on all responses including
+  pages, images, assets and API endpoints.
+- Netlify's root `_headers` applies the same `X-Robots-Tag` to `/*`.
+- `robots.txt` blocks `Googlebot-Image` from image crawling, but **allows**
+  normal Googlebot to crawl pages. This is intentional: Google must be able
+  to read `noindex` to remove pages from results; setting
+  `User-agent: * / Disallow: /` instead may result in URL-only listings.
+- No sitemap is published. CI checks that the policy remains present in
+  the deployed static build.
+
+`noindex` affects search results, not direct access: anyone who has the
+URL can still visit this public site. If results have already been indexed,
+the verified site owner can use Google Search Console's **Removals** tool
+to hide them faster while Google processes the permanent `noindex` rules.
+
 
 
 ## Activities
