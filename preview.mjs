@@ -20,6 +20,8 @@ const routes = new Map([
   ['/signin/', 'signin/index.html'],
   ['/signin/index.html', 'signin/index.html'],
   ['/activity-data.json', 'activity-data.json'],
+  ['/club-content.json', 'club-content.json'],
+  ['/club-content.js', 'club-content.js'],
   ['/activity.js', 'activity.js'],
   ['/signin.js', 'signin.js'],
   ['/email-verification.js', 'email-verification.js'],
