@@ -99,3 +99,23 @@
 .auth-code-row input{width:min(100%,185px);height:44px;border:1px solid #6e513e;border-radius:7px;background:#171615;color:#f6f0eb;font-size:20px;letter-spacing:5px;font-weight:800;text-align:center;outline:none;font-variant-numeric:tabular-nums}
 .auth-code-row input:focus{border-color:#f46b35;box-shadow:0 0 0 3px rgba(244,107,53,.12)}
 @media(max-width:390px){.auth-verify-line{align-items:flex-start}.auth-code-row input{width:145px;min-width:0}.auth-code-row{gap:7px}.auth-verify-action{padding:10px}}
+
+/* Dedicated club admin tools live in the signed-in account panel, NOT the bell. */
+.auth-mail-preferences{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;padding:14px 0;border-top:1px solid #55453b;margin:12px 0}
+.auth-mail-preferences p{flex:1;font-size:12px;line-height:1.5;color:#d2c0b3}
+.auth-mail-button{background:#2c2420;border:1px solid #a36b47;color:#ffd0ab;font-weight:800;border-radius:6px;padding:10px 13px;cursor:pointer;font-size:11px}
+.auth-mail-button:disabled{opacity:.55;cursor:wait}
+.club-admin[hidden]{display:none!important}
+.club-admin{margin:28px 0 12px;border:1px solid #6d4936;border-top:3px solid #f46b35;background:linear-gradient(150deg,#2c2420,#1b1b1a);border-radius:10px;padding:clamp(18px,3vw,26px);box-shadow:0 10px 40px #0005}
+.club-admin-eyebrow{font-size:10px;letter-spacing:1.5px;color:#e98f5d;font-weight:800}
+.club-admin h2{margin:9px 0;font-family:Arial,Helvetica,sans-serif;font-weight:800;font-size:clamp(20px,2vw,27px);color:#fff;letter-spacing:-.5px}
+.club-admin-top p{font-size:12px;line-height:1.6;color:#c7b8ac}
+.club-admin-form{margin:22px 0 0;display:flex;flex-direction:column;gap:10px}
+.club-admin-form>label:not(.club-admin-send){font-size:12px;font-weight:800;color:#ded1c5}
+.club-admin-form input:not([type=checkbox]),.club-admin-form textarea{width:100%;border:1px solid #675344;border-radius:7px;padding:13px;background:#171615;color:#fff;outline:0;font:14px Arial,Helvetica,sans-serif;resize:vertical}
+.club-admin-form input:focus,.club-admin-form textarea:focus{border-color:#f46b35;box-shadow:0 0 0 3px #f46b3526}
+.club-admin-send{display:flex;gap:10px;align-items:flex-start;margin:7px 0;font-size:12px;line-height:1.5;color:#dfc9b8;cursor:pointer}
+.club-admin-send input{width:17px;height:17px;accent-color:#f46b35;margin-top:1px}
+#club-admin-status{font-size:12px;line-height:1.6;color:#dfb295;min-height:20px}
+#club-admin-status[data-status=success]{color:#a3d9b1}
+#club-admin-status[data-status=error]{color:#ff9b86}
