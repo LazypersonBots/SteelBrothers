@@ -17,6 +17,11 @@
   status = 301
 
 [[redirects]]
+  from = "/history"
+  to = "/history/"
+  status = 301
+
+[[redirects]]
   from = "/signin"
   to = "/signin/"
   status = 301
