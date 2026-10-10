@@ -30,6 +30,7 @@ const routes = new Map([
   ['/favicon.png', 'favicon.png'], ['/robots.txt', 'robots.txt']
 ]);
 const MIME = new Map([
+  ['.txt', 'text/plain; charset=utf-8'],
   ['.html', 'text/html; charset=utf-8'],
   ['.js', 'application/javascript; charset=utf-8'],
   ['.json', 'application/json; charset=utf-8'],
