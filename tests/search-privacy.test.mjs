@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { createSteelBrothersServer } from '../server/render-app.mjs';
 
 const read=path=>readFile(new URL('../'+path,import.meta.url),'utf8');
-const pagePaths=['index.html','gallery/index.html','activity/index.html','signin/index.html'];
+const pagePaths=['index.html','gallery/index.html','activity/index.html','signin/index.html','history/index.html'];
 
 test('all public HTML pages opt out of Google and other search engines',async()=>{
  for(const path of pagePaths){
