@@ -255,3 +255,46 @@ with mock stores, date filtering, approved-only editorial rendering, gallery,
 announcement permission checks, build routes and noindex. A real device/browser
 walkthrough and checks of production Render, Neon and Resend credentials
 remain necessary before claiming live integrations are verified.
+
+## History page, clubhouse, memorial and Czech/English presentation
+
+History is now a standalone **/history/** page, linked from the original home
+About section and navigation. Home keeps its overall layout. Both Render and
+Netlify/preview route the new page directly from the same GitHub deployment;
+the History page has `noindex, nofollow, noimageindex` and inherits the
+site-wide `X-Robots-Tag`. **Never enable Google indexing** without permission.
+
+The homepage now includes a Club House section, displaying these **existing**
+gallery pictures without moving or deleting them:
+`photos/2026-10-04-170046-klubovna.webp` and
+`photos/2026-10-04-181746-klubovy-bar.webp`.
+A separate opening-hours area stays explicitly **unconfirmed** until
+verified hours are provided. To publish actual hours, populate
+`club-content.json` under
+`clubhouse: { "approved": true, "openingHours": [
+{ "day": "Pondělí", "dayEn": "Monday", "hours": "…", "hoursEn": "…" }
+] }`. Do not put sample values on the live site.
+
+The existing Support block now emphasizes **E-SHOP / MERCH STORE**, but
+still has no checkout or fake products. Social links are a separate card in
+the same panel grid as Merch, Contact and Memorial. Add approved items to
+`socials`, e.g. `{ "platform": "Instagram",
+"url": "https://www.instagram.com/real-account", "approved": true }`
+using **real verified account links only**; HTTPS recognized-platform
+allowlisting prevents unsafe links. The **R.I.P. / In Memory** card remains
+visible with an honest empty state, and displays approved tributes from
+`memorials` only. No club members or memorial details have been invented.
+
+All public pages, including **Sign-in / Registration**, load `language.js`.
+A compact CZ / EN switch remembers the user's chosen language in localStorage
+and updates headings, buttons, input labels/placeholders, and client-side
+account/verification/admin status messages without altering authentication.
+Navigation labels include both languages at a glance. For approved editorial
+content, supply `historyEn`, `titleEn`, `descriptionEn`, `nameEn`,
+`tributeEn`, `addressEn`, `publicClubhouseEn` and similar optional
+English fields; when no translation is approved the original editorial text
+is retained rather than inventing a translation. User-written club
+announcements remain in their original authored language.
+
+No database tables, secrets, DNS records or account/API behavior were changed.
+Run `npm run build` and inspect the GitHub Actions check before deployment.
