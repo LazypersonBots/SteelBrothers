@@ -14,7 +14,7 @@ function equals(a,b) {
 export function isVerifiedClubAdmin(member) {
   return !!member && ADMIN_EMAILS.has(member.email) &&
     member.email_verified===true && !!member.verified_at &&
-    Number.isSafeInteger(Number(member.id));
+    member.id!=null && Number(member.id)>0 && Number.isSafeInteger(Number(member.id));
 }
 export function createAdminAccess({password,secret,now=Date.now}={}){
   const configured=typeof password==='string'&&password.length>=12&&
