@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="styles.css">
   <script src="/gallery.js" defer></script>
   <script src="/activity.js" defer></script>
+  <script src="/club-content.js" defer></script>
   <link rel="stylesheet" href="/announcements.css">
   <script src="/announcements.js" defer></script>
   <link rel="stylesheet" href="/member-profile.css">
@@ -48,12 +49,25 @@
 
     <section class="section about" id="club" aria-labelledby="club-title">
       <div><p class="eyebrow accent"> / O KLUBU</p><h2 id="club-title">VÍC NEŽ STROJE.<br>LIDI ZA ŘÍDÍTKY.</h2><p class="section-note">KAŽDÝ SVÝM STYLEM. SPOLEČNĚ STEJNÝM SMĚREM.</p></div>
-      <div class="about-copy"><p class="lead">Někdy stačí plná nádrž,<br>volná sobota a dobrá parta.</p><p>Steel Brothers spojuje chuť vyrazit ven, objevovat nové silnice a užít si cestu společně. Nezáleží na značce motorky. Důležitý je respekt a to, že se na sebe můžeme spolehnout.</p><div class="values"><article><h3>Držíme při sobě.</h3><p>Na cestě i při zastávkách. Na každého se počká.</p></article><article><h3>Jezdíme pro radost.</h3><p>Dobré zatáčky, společné kafe a žádný zbytečný spěch.</p></article></div></div>
+      <div class="about-copy"><p class="lead">Někdy stačí plná nádrž,<br>volná sobota a dobrá parta.</p><p>Steel Brothers spojuje chuť vyrazit ven, objevovat nové silnice a užít si cestu společně. Nezáleží na značce motorky. Důležitý je respekt a to, že se na sebe můžeme spolehnout.</p><div class="values"><article><h3>Držíme při sobě.</h3><p>Na cestě i při zastávkách. Na každého se počká.</p></article><article><h3>Jezdíme pro radost.</h3><p>Dobré zatáčky, společné kafe a žádný zbytečný spěch.</p></article></div>
+        <details class="club-history" id="history">
+          <summary><span>HISTORIE KLUBU</span><span aria-hidden="true">+</span></summary>
+          <p data-club-history>Oficiální historii klubu zveřejníme až po schválení podkladů klubem.</p>
+          <div class="club-chapters" data-club-chapters hidden><h3>Oficiální chapters</h3></div>
+        </details>
+      </div>
     </section>
 
     <section class="section rides" id="rides" aria-labelledby="rides-title">
-      <div class="section-top"><div><p class="eyebrow accent"> / CO SE CHYSTÁ</p><h2 id="rides-title">NAŠE AKTIVITY.</h2></div><span class="badge">PROGRAM PŘIPRAVUJEME</span></div>
-      <p class="activity-section-intro">Tři nejnovější položky našeho programu. Zatím jde o ukázkové aktivity bez potvrzených termínů.</p>
+      <div class="section-top"><div><p class="eyebrow accent"> / CO SE CHYSTÁ</p><h2 id="rides-title">NAŠE AKTIVITY.</h2></div><span class="badge" data-next-event>ZATÍM BEZ POTVRZENÉHO TERMÍNU</span></div>
+      <p class="activity-section-intro">Zveřejňujeme pouze potvrzené veřejné akce, vyjížďky a klubová setkání. Nejbližší termíny se zobrazí automaticky.</p>
+      <aside class="club-news-preview" aria-labelledby="home-news-title">
+        <div class="club-news-heading">
+          <div><p class="eyebrow accent"> / NEWS</p><h3 id="home-news-title">NOVINKY Z KLUBU.</h3></div>
+          <button type="button" class="club-news-open" data-open-announcements>VŠECHNA OZNÁMENÍ <span aria-hidden="true">↗</span></button>
+        </div>
+        <div class="club-news-feed" data-club-news aria-live="polite">Načítání aktuálních oznámení…</div>
+      </aside>
       <div class="activity-grid activity-grid-home" data-activity-list="home" aria-live="polite">
         <p class="activity-empty">Načítání aktivit…</p>
       </div>
@@ -72,9 +86,34 @@
       </div>
     </section>
 
+    <section class="section club-public-info" id="support" aria-labelledby="support-title">
+      <div class="club-public-panel">
+        <p class="eyebrow accent"> / SUPPORT</p>
+        <h2 id="support-title">PODPOŘ<br>NAŠI CESTU.</h2>
+        <p>Prostor pro oficiálně schválený veřejný support merch. Členské insignie ani neveřejné nášivky se zde nenabízejí.</p>
+        <div data-merch-pending>
+          <div class="club-merch-tags" aria-label="Připravované kategorie"><span>SUPPORT TRIČKA</span><span>SAMOLEPKY</span><span>VEŘEJNÉ NÁŠIVKY</span></div>
+          <p class="club-public-note">Veřejná nabídka se teprve připravuje. Momentálně zde nelze nic objednat.</p>
+        </div>
+        <div class="club-merch-list" data-merch-list hidden></div>
+      </div>
+      <div class="club-public-panel" id="contact">
+        <p class="eyebrow accent"> / CONTACT</p>
+        <h2>KONTAKT<br>NA KLUB.</h2>
+        <p>Ověřené veřejné kontaktní údaje a případnou adresu veřejné klubovny zveřejníme, jakmile je klub schválí.</p>
+        <div class="club-contact-details" data-public-contact>Oficiální kontaktní údaje zatím nejsou zveřejněny.</div>
+      </div>
+    </section>
+
+    <section class="section club-memorial" data-memorials id="in-memory" aria-labelledby="memorial-title" hidden>
+      <p class="eyebrow accent"> / IN MEMORY</p>
+      <h2 id="memorial-title">NAVŽDY SOUČÁSTÍ CESTY.</h2>
+      <div class="club-memorial-list" data-memorial-list></div>
+    </section>
+
     <section class="join section" aria-labelledby="join-title"><div><p class="eyebrow">DALŠÍ KILOMETRY MŮŽEME JET SPOLU.</p><h2 id="join-title">MÁŠ STEJNÝ<br><span>SMĚR?</span></h2></div><div class="join-action"><p>Seznam se s partou.<br>O zbytku si povíme u motorek.</p><a class="join-demo-link" href="/signin/">CHCI SE PŘIDAT</a><small>Registrace s ověřením e-mailu.</small></div></section>
   </main>
-  <footer><a href="#home" class="footer-brand">STEEL BROTHERS<span>MOTORCYCLE CLUB</span></a><p>Steel Brothers · Motorcycle Club</p><span>© 2026 STEEL BROTHERS</span></footer>
+  <footer><a href="#home" class="footer-brand">STEEL BROTHERS<span>MOTORCYCLE CLUB</span></a><nav class="footer-links" aria-label="Další informace"><a href="#history">Historie</a><a href="#support">Support</a><a href="#contact">Kontakt</a></nav><p>Steel Brothers · Motorcycle Club</p><span>© 2026 STEEL BROTHERS</span></footer>
   <button id="sb-bell" type="button" class="sb-bell" aria-label="Oznámení Steel Brothers" aria-haspopup="dialog" aria-expanded="false"><span aria-hidden="true">🔔</span><span class="sb-bell-count" hidden></span></button>
   <div id="sb-notices" class="sb-notice-backdrop" hidden>
     <section class="sb-notice-panel" role="dialog" aria-modal="true" aria-labelledby="sb-notice-title" tabindex="-1">
