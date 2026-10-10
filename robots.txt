@@ -1,0 +1,11 @@
+# Steel Brothers must never appear in search results.
+# Pages remain crawlable ONLY so Google and other search engines can read
+# X-Robots-Tag: noindex and each page's robots meta tag.
+# Blocking page crawling here could cause URL-only search results.
+# Do not add a Sitemap directive or remove the sitewide noindex headers.
+
+User-agent: Googlebot-Image
+Disallow: /
+
+User-agent: *
+Allow: /
