@@ -45,7 +45,7 @@ test('CZ/EN switch translates actual text and remembers language without changin
    const doc={
      body,title:'Steel Brothers — Jedna cesta. Jedna parta.',
      documentElement:{lang:'cs'},dispatchEvent(){},
-     querySelector(selector){return selector==='.header'?header:null;},
+     querySelector(selector){return selector==='.header'?header:selector==='[data-language-switch]'?header.children.find(node=>Object.hasOwn(node.dataset,'languageSwitch'))||null:null;},
      createElement:element,
      createTreeWalker(root){
        const nodes=[];
