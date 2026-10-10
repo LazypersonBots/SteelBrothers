@@ -82,9 +82,10 @@ test('signin creates actual accounts only after server email proof', async () =>
   assert.match(page,/id="email-opt-in"/);
   assert.match(page,/id="account-summary"/);
   assert.doesNotMatch(page,/DEMO ÚČTY|účet nebude vytvořen/);
-  assert.match(js,/\/api\/account\/register/);
+  assert.match(js,/\/api\/account\//);
+  assert.match(js,/mode==='register'\?'register':'login'/);
   assert.match(js,/verificationProof/);
-  assert.match(js,/\/api\/account\/login/);
+  assert.match(js,/\/api\/account\//);
   assert.match(js,/\/api\/account\/logout/);
   assert.match(js,/\/api\/account\/preferences/);
   assert.match(otp,/result\.verificationProof/);
