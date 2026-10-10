@@ -165,7 +165,7 @@ export function createClubService({db,secret,sendCodeEmail,sendClubEmail,now=Dat
    for(let i=0;i<limit;i++){
      // Claim a single message with a DB lock. One Render instance is expected.
      const claim=await db.transaction(async q=>{
-       const row=(await q("SELECT d.announcement_id,d.member_id,m.email,a.title,a.body FROM sb_announcement_emails d JOIN sb_members m ON m.id=d.member_id JOIN sb_announcements a ON a.id=d.announcement_id WHERE d.status='queued' ORDER BY d.announcement_id,d.member_id LIMIT 1 FOR UPDATE OF d SKIP LOCKED")).rows[0];
+       const row=(await q("SELECT d.announcement_id,d.member_id,m.email,a.title,a.body FROM sb_announcement_emails d JOIN sb_members m ON m.id=d.member_id JOIN sb_announcements a ON a.id=d.announcement_id WHERE d.status='queued' AND m.email_opt_in=true ORDER BY d.announcement_id,d.member_id LIMIT 1 FOR UPDATE OF d SKIP LOCKED")).rows[0];
        if(row)await q("UPDATE sb_announcement_emails SET status='sending' WHERE announcement_id=$1 AND member_id=$2",[row.announcement_id,row.member_id]);
        return row;
      });
