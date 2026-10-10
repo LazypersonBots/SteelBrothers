@@ -279,6 +279,40 @@ export function createSteelBrothersServer({
         isAdmin:isVerifiedClubAdmin(member)
       }:null}));return;
     }
+    if(url.pathname==='/api/announcements/delete'){
+      if(req.method!=='POST'){
+        await sendHttpResponse(res,apiResponse(405,{error:'Method not allowed'}));return;
+      }
+      if(!clubService){
+        await sendHttpResponse(res,apiResponse(503,{error:'Oznámení nejsou dostupná.'}));return;
+      }
+      try{
+        const member=await clubService.current(req.headers.cookie);
+        if(!isVerifiedClubAdmin(member)){
+          await sendHttpResponse(res,apiResponse(403,{error:'Přístup pouze pro ověřené správce klubu.'}));return;
+        }
+        if(!adminAccess.configured){
+          await sendHttpResponse(res,apiResponse(503,{error:'Heslo administrace není nastavené na serveru.'}));return;
+        }
+        const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname,2048);
+        const {data,error}=await readEmailPayload(request,['id','password'],allowedOrigins);
+        if(error){await sendHttpResponse(res,error);return;}
+        // Deletion needs the actual password each time, not an unlocked admin cookie.
+        if(!adminAccess.verifyPassword(data.password)){
+          const ip=(req.headers['x-forwarded-for']||req.socket.remoteAddress||'unknown').toString().split(',')[0].trim().slice(0,70);
+          const limited=rateLimit('admin-delete:'+member.id+':'+ip,5,15*60_000);
+          await sendHttpResponse(res,apiResponse(limited?429:403,{error:limited
+            ?'Příliš mnoho pokusů. Zkus to za 15 minut.':'Nesprávné heslo administrace.'}));return;
+        }
+        const action=await clubService.deleteAnnouncement(data.id,member);
+        const {status,...body}=action;
+        await sendHttpResponse(res,apiResponse(status,body));
+      }catch(e){
+        log.error('Announcement deletion failed:',e?.code||e?.name||'unknown');
+        await sendHttpResponse(res,apiResponse(e?.status===413?413:503,{error:'Smazání se nepodařilo. Zkus to později.'}));
+      }
+      return;
+    }
     if(url.pathname==='/api/announcements' && req.method==='GET') {
       try {
         await sendHttpResponse(res,apiResponse(200,clubService
