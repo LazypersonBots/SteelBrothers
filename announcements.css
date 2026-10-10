@@ -32,3 +32,18 @@
 .auth-account-summary p{color:#d5c3b6;margin:15px 0}
 @media(max-width:650px){.sb-bell{right:10px;top:10px;width:38px;height:38px}.sb-notice-backdrop{padding:62px 8px 8px}.sb-notice-panel{max-height:calc(100dvh - 70px);padding:18px}.sb-notice-items{max-height:36vh}}
 @media(prefers-reduced-motion:reduce){.sb-bell{transition:none}}
+
+/* Delete controls only appear for verified club owners. */
+.sb-notice-item-top{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:22px}
+.sb-notice-delete{display:grid;place-items:center;flex:none;width:28px;height:28px;border:1px solid #655046;border-radius:6px;background:#302925;color:#e5b9a5;cursor:pointer;padding:0}
+.sb-notice-delete:hover,.sb-notice-delete:focus-visible{background:#4b2925;border-color:#ff796a;color:#ffb2a5}
+.sb-notice-delete-form{margin-top:14px;border:1px solid #7d4b39;border-radius:7px;background:#191614;padding:12px;display:flex;flex-direction:column;gap:10px}
+.sb-notice-delete-form p{margin:0;color:#f1c7b3;font-size:12px;line-height:1.5}
+.sb-notice-delete-form label{display:flex;flex-direction:column;gap:7px;color:#f5e5db;font-size:12px}
+.sb-notice-delete-form input{width:100%;min-width:0;background:#100f0e;color:#fff;border:1px solid #786252;border-radius:5px;padding:9px;font:14px Arial,sans-serif}
+.sb-notice-delete-form input:focus-visible{outline:2px solid #f46b35;outline-offset:1px}
+.sb-notice-delete-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.sb-notice-delete-actions button{cursor:pointer;border:1px solid #735746;border-radius:5px;background:#312c27;color:#fff;font-weight:700;padding:9px 12px;font-size:11px}
+.sb-notice-delete-actions .sb-notice-delete-submit{background:#a8392b;border-color:#c55341}
+.sb-notice-delete-actions button:disabled{opacity:.55;cursor:wait}
+.sb-notice-delete-form .sb-notice-delete-error{color:#ff9a82}
