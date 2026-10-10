@@ -87,6 +87,7 @@ export async function buildGallery() {
     await cp(join(root, file), join(output, file));
   }
   await cp(join(root, 'gallery', 'index.html'), join(output, 'gallery', 'index.html'));
+  await cp(join(root, 'history', 'index.html'), join(output, 'history', 'index.html'));
   await cp(join(root, 'activity', 'index.html'), join(output, 'activity', 'index.html'));
   await cp(join(root, 'signin', 'index.html'), join(output, 'signin', 'index.html'));
 
