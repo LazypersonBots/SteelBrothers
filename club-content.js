@@ -37,7 +37,7 @@
     const chapterNames=Array.isArray(content.chapters)
       ?content.chapters.map(c=>typeof c==='string'?safeText(c,120):c?.approved===true?localized(c,'name',120):null).filter(Boolean):[];
     if(chapters&&chapterNames.length){
-      const previous=chapters.querySelector('.club-chapters-list');
+      const previous=chapters.querySelector?.('.club-chapters-list');
       if(previous)previous.remove();
       const list=element('ul','club-chapters-list');
       for(const chapter of chapterNames)list.append(element('li','',chapter));
