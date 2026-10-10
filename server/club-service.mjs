@@ -29,7 +29,7 @@ async function passwordMatches(password,saved) {
 }
 const publicMember=member=>member?{
   nickname:member.nickname,email:member.email,emailOptIn:member.email_opt_in,
-  isAdmin:ADMIN_EMAILS.has(member.email)
+  isAdmin:ADMIN_EMAILS.has(member.email) && member.email_verified===true && !!member.verified_at
 }:null;
 const codeHash=(secret,email,nonce,value)=>secretHmac(secret,'otp:'+email+':'+nonce+':'+value);
 
@@ -38,7 +38,7 @@ export function createClubService({db,secret,sendCodeEmail,sendClubEmail,now=Dat
  const date=()=>new Date(now());
  const expires=ms=>new Date(now()+ms);
  const lockEmail=(q,email)=>q('SELECT pg_advisory_xact_lock(hashtext($1))',[email]);
- const findMember=(email)=>db.query('SELECT id,email,nickname,email_opt_in,password_hash FROM sb_members WHERE email=$1',[email]);
+ const findMember=(email)=>db.query('SELECT m.id,m.email,m.nickname,m.email_opt_in,m.password_hash,m.verified_at,EXISTS(SELECT 1 FROM sb_email_verifications v WHERE v.email=m.email AND v.verification_count>0) AS email_verified FROM sb_members m WHERE m.email=$1',[email]);
 
  async function sendCode(address) {
    const email=normalizeEmail(address);
@@ -112,8 +112,9 @@ export function createClubService({db,secret,sendCodeEmail,sendClubEmail,now=Dat
        return fail(403,'Ověření e-mailu vypršelo. Pošli nový kód.');
      const exists=(await q('SELECT id FROM sb_members WHERE email=$1',[email])).rows[0];
      if(exists)return fail(409,'Tento e-mail už má účet. Přihlas se.');
-     const created=(await q('INSERT INTO sb_members(email,nickname,password_hash,email_opt_in) VALUES($1,$2,$3,$4) RETURNING id,email,nickname,email_opt_in',
-       [email,nickname,hash,input.emailOptIn===true])).rows[0];
+     const created=(await q('INSERT INTO sb_members(email,nickname,password_hash,email_opt_in) VALUES($1,$2,$3,FALSE) RETURNING id,email,nickname,email_opt_in,verified_at',
+       [email,nickname,hash])).rows[0];
+     created.email_verified=true;
      await q("UPDATE sb_email_verifications SET state='consumed',proof_hash=NULL WHERE email=$1",[email]);
      const setCookie=await sessionFor(created.id,q);
      return result(201,{member:publicMember(created),setCookie});
@@ -132,7 +133,7 @@ export function createClubService({db,secret,sendCodeEmail,sendClubEmail,now=Dat
  async function current(cookieHeader) {
    const match=/(?:^|;\s*)sb_session=([a-zA-Z0-9_-]{30,64})(?:;|$)/.exec(cookieHeader||'');
    if(!match)return null;
-   const response=await db.query('SELECT m.id,m.email,m.nickname,m.email_opt_in FROM sb_sessions s JOIN sb_members m ON m.id=s.member_id WHERE s.token_hash=$1 AND s.expires_at>now()',[hex(match[1])]);
+   const response=await db.query('SELECT m.id,m.email,m.nickname,m.email_opt_in,m.verified_at,EXISTS(SELECT 1 FROM sb_email_verifications v WHERE v.email=m.email AND v.verification_count>0) AS email_verified FROM sb_sessions s JOIN sb_members m ON m.id=s.member_id WHERE s.token_hash=$1 AND s.expires_at>now()',[hex(match[1])]);
    return response.rows[0]||null;
  }
  async function logout(cookieHeader) {
@@ -145,7 +146,8 @@ export function createClubService({db,secret,sendCodeEmail,sendClubEmail,now=Dat
    return result(200,{announcements:r.rows});
  }
  async function publish(input,member){
-   if(!member||!ADMIN_EMAILS.has(member.email))return fail(403,'Tuto akci mohou provést pouze správci klubu.');
+   if(!member||!ADMIN_EMAILS.has(member.email)||member.email_verified!==true||!member.verified_at)
+     return fail(403,'Oznámení mohou zveřejňovat pouze ověření správci klubu.');
    const title=typeof input?.title==='string'?input.title.trim():'';
    const body=typeof input?.body==='string'?input.body.trim():'';
    if(title.length<4||title.length>120||body.length<5||body.length>3000)

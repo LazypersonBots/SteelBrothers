@@ -11,7 +11,10 @@ function memoryDB() {
     if(sql.startsWith('SELECT * FROM sb_email_verifications'))return {rows:verification.has(p[0])?[{...verification.get(p[0])}]:[]};
     if(sql.startsWith('SELECT state,proof_hash'))return {rows:verification.has(p[0])?[{...verification.get(p[0])}]:[]};
     if(sql.startsWith('SELECT id FROM sb_members'))return {rows:members.has(p[0])?[{id:members.get(p[0]).id}]:[]};
-    if(sql.startsWith('SELECT id,email,nickname,email_opt_in,password_hash'))return {rows:members.has(p[0])?[members.get(p[0])]:[]};
+    if(sql.startsWith('SELECT m.id,m.email,m.nickname,m.email_opt_in,m.password_hash')) {
+      const row=members.get(p[0]);
+      return {rows:row?[{...row,email_verified:(verification.get(row.email)?.verification_count||0)>0}]:[]};
+    }
     if(sql.startsWith('INSERT INTO sb_email_verifications')){
       const old=verification.get(p[0]);
       verification.set(p[0],{
@@ -33,16 +36,16 @@ function memoryDB() {
       Object.assign(verification.get(p[0]),{state:'consumed',proof_hash:null});return {rows:[]};
     }
     if(sql.startsWith('INSERT INTO sb_members')){
-      const person={id:++sequence,email:p[0],nickname:p[1],password_hash:p[2],email_opt_in:p[3]};
+      const person={id:++sequence,email:p[0],nickname:p[1],password_hash:p[2],email_opt_in:false,verified_at:new Date()};
       members.set(p[0],person);return {rows:[person]};
     }
     if(sql.startsWith('INSERT INTO sb_sessions')){
       sessions.set(p[0],{memberId:p[1],expiresAt:p[2]});return {rows:[]};
     }
-    if(sql.startsWith('SELECT m.id,m.email,m.nickname,m.email_opt_in FROM sb_sessions')){
+    if(sql.startsWith('SELECT m.id,m.email,m.nickname,m.email_opt_in,m.verified_at,EXISTS')){
       const session=sessions.get(p[0]);
       const member=[...members.values()].find(x=>x.id===session?.memberId);
-      return {rows:member?[member]:[]};
+      return {rows:member?[{...member,email_verified:(verification.get(member.email)?.verification_count||0)>0}]:[]};
     }
     if(sql.startsWith('DELETE FROM sb_sessions')){sessions.delete(p[0]);return {rows:[]};}
     if(sql.startsWith('INSERT INTO sb_announcements')){
@@ -81,7 +84,7 @@ test('ordinary email can verify only once, verified proof can create one real ac
   const account=await service.register({email:'member@example.com',nickname:'Rider',
     password:'correct-password-123',verificationProof:verified.verificationProof,emailOptIn:true});
   assert.equal(account.status,201);
-  assert.equal(account.member.emailOptIn,true);
+  assert.equal(account.member.emailOptIn,false);
   assert.match(db.members.get('member@example.com').password_hash,/^scrypt\$/);
   assert.doesNotMatch(db.members.get('member@example.com').password_hash,/correct-password/);
   assert.equal((await service.register({email:'member@example.com',nickname:'Other',
@@ -113,15 +116,33 @@ test('the two verified admin emails may reverify 30 times, not 31',async()=>{
   assert.equal((await service.sendCode('gamedriverstudio@gmail.com')).status,409);
 });
 
-test('admin privileges require verified account and active session',async()=>{
+test('publishing requires verified admin, not merely an admin email string',async()=>{
   const db=memoryDB(),sent=[];
   const service=createClubService({db,secret:'really-random-long-signing-key-for-tests',
     sendCodeEmail:async({code})=>sent.push(code),sendClubEmail:async()=>{}});
-  assert.equal((await service.publish({title:'New meeting',body:'Come along',emailEveryone:true},
-    {email:'gamedriverstudio@gmail.com',id:999})).status,201);
-  assert.equal((await service.publish({title:'New meeting',body:'Come along'},
-    {email:'random@gmail.com',id:1})).status,403);
+  const forged={id:999,email:'gamedriverstudio@gmail.com'};
+  assert.equal((await service.publish({title:'New meeting',body:'Come along',emailEveryone:true},forged)).status,403);
   assert.equal((await service.publish({title:'New meeting',body:'Come along'},null)).status,403);
+  const verifiedButNotLoggedIn={id:999,email:'gamedriverstudio@gmail.com',verified_at:new Date(),email_verified:false};
+  assert.equal((await service.publish({title:'New meeting',body:'Come along'},verifiedButNotLoggedIn)).status,403);
+
+  assert.equal((await service.sendCode('gamedriverstudio@gmail.com')).status,200);
+  const verified=await service.verifyCode('gamedriverstudio@gmail.com',sent[0]);
+  assert.equal(verified.status,200);
+  const registered=await service.register({
+    email:'gamedriverstudio@gmail.com',nickname:'ClubAdmin',
+    password:'correct-password-123',verificationProof:verified.verificationProof
+  });
+  assert.equal(registered.status,201);
+  assert.equal(registered.member.isAdmin,true);
+  const member=await service.current(registered.setCookie);
+  assert.equal(member.email_verified,true);
+  assert.equal((await service.publish({title:'New meeting',body:'Come along',emailEveryone:true},member)).status,201);
+  assert.equal((await service.publish({title:'New meeting',body:'Come along'},{
+    ...member,email:'other@example.com'
+  })).status,403);
+  assert.equal((await service.logout(registered.setCookie)).status,200);
+  assert.equal(await service.current(registered.setCookie),null);
   const all=await service.listAnnouncements();
   assert.equal(all.announcements.length,1);
 });

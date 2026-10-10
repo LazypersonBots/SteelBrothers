@@ -17,6 +17,7 @@
   <script src="/email-verification.js" defer></script>
   <link rel="stylesheet" href="/announcements.css">
   <script src="/announcements.js" defer></script>
+  <script src="/club-admin.js" defer></script>
 </head>
 <body class="auth-page">
   <main class="auth-layout">
@@ -75,14 +76,22 @@
               <button type="button" class="auth-reveal" data-toggle-password="confirm-password" aria-label="Zobrazit potvrzení hesla" aria-pressed="false">Zobrazit</button>
             </div>
           </div>
-          <label id="notification-opt-in" class="auth-checkbox">
-            <input id="email-opt-in" type="checkbox">
-            <span>Chci dostávat klubová oznámení e-mailem (volitelné; kdykoli lze vypnout).</span>
-          </label>
           <button id="auth-submit" class="auth-submit" type="submit">VYTVOŘIT ÚČET <span aria-hidden="true">→</span></button>
           <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p>
         </form>
-        <section id="account-summary" class="auth-account-summary" hidden><h2>Vítej v klubu!</h2><p id="account-name"></p><label class="auth-checkbox"><input id="account-email-opt-in" type="checkbox"> Klubová oznámení e-mailem</label><button id="account-logout" class="auth-submit" type="button">ODHLÁSIT SE</button></section>
+        <section id="account-summary" class="auth-account-summary" hidden><h2>Vítej v klubu!</h2><p id="account-name"></p><div class="auth-mail-preferences"><p id="account-mail-status">Klubové e-maily jsou volitelné.</p><button id="account-email-opt-in" type="button" class="auth-mail-button">POVOLIT KLUBOVÉ E-MAILY</button></div><button id="account-logout" class="auth-submit" type="button">ODHLÁSIT SE</button></section>
+        <section id="club-admin" class="club-admin" hidden aria-labelledby="club-admin-heading">
+          <div class="club-admin-top"><span class="club-admin-eyebrow">STEEL BROTHERS / CLUB MANAGEMENT</span><h2 id="club-admin-heading">SPRÁVA OZNÁMENÍ.</h2><p>Vytvářej aktuality pro klub. Všichni je uvidí pod zvonečkem, e-mail dostanou jen přihlášení odběratelé.</p></div>
+          <form id="club-admin-compose" class="club-admin-form">
+            <label for="club-admin-title">Nadpis oznámení</label>
+            <input id="club-admin-title" name="title" required minlength="4" maxlength="120" placeholder="Např. Sobotní vyjížďka">
+            <label for="club-admin-message">Zpráva pro členy</label>
+            <textarea id="club-admin-message" name="body" required minlength="5" maxlength="3000" rows="5" placeholder="Kde a kdy se sejdeme?"></textarea>
+            <label class="club-admin-send"><input id="club-admin-email" type="checkbox"> Odeslat e-mail členům, kteří si zapnuli klubové notifikace</label>
+            <button id="club-admin-submit" class="auth-submit" type="submit">ZVEŘEJNIT AKTUALITU →</button>
+            <p id="club-admin-status" role="status" aria-live="polite"></p>
+          </form>
+        </section>
         <p class="auth-footer-note">Účet se vytvoří až po ověření e-mailu. Tvé heslo je bezpečně zpracováno na serveru.</p>
       </div>
     </section>
@@ -119,13 +128,6 @@
     <section class="sb-notice-panel" role="dialog" aria-modal="true" aria-labelledby="sb-notice-title" tabindex="-1">
       <header class="sb-notice-header"><div><small>STEEL BROTHERS</small><h2 id="sb-notice-title">Oznámení <span aria-hidden="true">🔔</span></h2></div><button id="sb-notice-close" class="sb-notice-close" type="button" aria-label="Zavřít oznámení">×</button></header>
       <div id="sb-notice-items" class="sb-notice-items" aria-live="polite"><p>Načítání aktualit…</p></div>
-      <form id="sb-notice-compose" class="sb-notice-compose" hidden>
-        <h3>Nové klubové oznámení</h3><label for="sb-notice-subject">Nadpis</label><input id="sb-notice-subject" maxlength="120" required placeholder="Např. Nová vyjížďka">
-        <label for="sb-notice-message">Zpráva</label><textarea id="sb-notice-message" minlength="5" maxlength="3000" rows="4" required placeholder="Co je nového v klubu?"></textarea>
-        <label class="sb-notice-mail"><input id="sb-notice-send-email" type="checkbox"> Rozeslat e-mail členům, kteří mají povolená oznámení</label>
-        <button class="sb-notice-publish" type="submit">ZVEŘEJNIT OZNÁMENÍ</button><p id="sb-notice-feedback" role="status"></p>
-      </form>
-      <p id="sb-notice-login" class="sb-notice-footer" hidden><a href="/signin/">Přihlas se</a> pro klubové funkce.</p>
     </section>
   </div>
 </body>
