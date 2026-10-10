@@ -10,6 +10,10 @@ const output = resolve(fileURLToPath(new URL('./dist/', import.meta.url)));
 const routes = new Map([
   ['/', 'index.html'],
   ['/index.html', 'index.html'],
+  ['/history', 'history/index.html'],
+  ['/history/', 'history/index.html'],
+  ['/history/index.html', 'history/index.html'],
+  ['/language.js', 'language.js'],
   ['/gallery', 'gallery/index.html'],
   ['/gallery/', 'gallery/index.html'],
   ['/gallery/index.html', 'gallery/index.html'],
