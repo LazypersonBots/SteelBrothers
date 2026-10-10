@@ -24,6 +24,7 @@ const routes = new Map([
   ['/signin.js', 'signin.js'],
   ['/email-verification.js', 'email-verification.js'],
   ['/announcements.js', 'announcements.js'],
+  ['/club-admin.js', 'club-admin.js'],
   ['/announcements.css', 'announcements.css'],
   ['/auth.css', 'auth.css'],
   ['/gallery-data.json', 'gallery-data.json'],
