@@ -60,3 +60,61 @@
 @media(max-width:1120px){.activity-grid-home,.activity-grid-all{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){.header-action{padding:9px 11px;font-size:10px;gap:7px}.activity-grid-home,.activity-grid-all{grid-template-columns:1fr}.activity-card{min-height:0;padding:23px}.activity-page-heading h1{font-size:54px}.activity-page-lead{font-size:16px}}
 @media(prefers-reduced-motion:reduce){.activity-card{transition:none}.activity-card:hover{transform:none}}
+
+/* Steel Brothers editorial additions: preserve original layout and club palette. */
+.club-history{margin-top:29px;border-top:1px solid #615044;border-bottom:1px solid #615044;background:linear-gradient(110deg,rgba(244,107,53,.065),transparent 72%)}
+.club-history summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 4px;font-size:11px;font-weight:800;letter-spacing:1.6px;color:#f5b18a;cursor:pointer}
+.club-history summary::-webkit-details-marker{display:none}
+.club-history summary span:last-child{font-size:23px;font-weight:400;line-height:1;color:#f46b35}
+.club-history[open] summary span:last-child{transform:rotate(45deg)}
+.club-history summary:focus-visible,.club-news-open:focus-visible,.club-video-link:focus-visible,.club-contact-link:focus-visible{outline:2px solid #ff9864;outline-offset:5px}
+.club-history>p{font-size:14px;line-height:1.8;color:#c9b8a9;padding:0 4px 21px}
+.club-chapters{padding:0 4px 20px}
+.club-chapters h3{font-size:14px;color:#f1d2ba}
+.club-chapters-list{padding-left:18px;margin:10px 0 0;color:#cac3b9;font-size:14px}
+.club-news-preview{border:1px solid #534238;border-left:3px solid var(--orange);padding:22px 25px;margin:0 0 28px;background:#24211e}
+.club-news-heading{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.club-news-heading .accent{margin-bottom:8px}
+.club-news-heading h3{font-size:19px;letter-spacing:.2px}
+.club-news-open{padding:9px 12px;border:1px solid #89583f;background:transparent;color:#ffac7a;font-size:11px;font-weight:700;letter-spacing:.6px;cursor:pointer}
+.club-news-open:hover{background:#3b291e;border-color:#ffa16f}
+.club-news-feed{margin-top:13px;font-size:13px;line-height:1.7;color:#bfb7ae}
+.club-news-item h3{font-family:Arial,sans-serif;font-size:16px;line-height:1.4;color:#eee3d8}
+.club-news-item p{margin-top:6px;color:#bfb7ae;overflow-wrap:anywhere;white-space:pre-wrap}
+.activity-date{font-size:13px;color:#f8af82;letter-spacing:.4px;font-weight:700}
+.activity-location{font-size:12px;color:#c0b6a9;border-top:1px solid #4c433a;padding-top:10px}
+.club-public-info{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;background:#1b1a18;border-top:1px solid #342f2b}
+.club-public-panel{min-width:0;border:1px solid #514037;background:linear-gradient(145deg,#27211d,#1d1b19);padding:35px 34px;position:relative}
+.club-public-panel:before{content:'';display:block;position:absolute;top:0;left:0;width:70px;height:3px;background:var(--orange)}
+.club-public-panel h2{font-size:clamp(34px,3.3vw,53px);line-height:1.08;margin-bottom:17px}
+.club-public-panel>p:not(.eyebrow){color:#c6bcb3;font-size:14px;line-height:1.85}
+.club-merch-tags{margin:25px 0 15px;display:flex;gap:9px;flex-wrap:wrap}
+.club-merch-tags span{font-size:10px;letter-spacing:.7px;border:1px solid #6d4d39;background:#302720;padding:8px 10px;color:#ffd0b0;font-weight:700}
+.club-public-note{font-size:12px;line-height:1.7;color:#c0b5ac}
+.club-contact-details{margin-top:28px;display:flex;flex-direction:column;align-items:flex-start;gap:10px;font-size:13px;line-height:1.7;color:#e5c6b0;overflow-wrap:anywhere}
+.club-contact-link{color:#ffa579;text-decoration:underline;text-underline-offset:4px}
+.club-merch-list{display:grid;gap:13px;margin-top:20px}
+.club-merch-list[hidden],.club-memorial[hidden]{display:none!important}
+.club-merch-card{border-top:1px solid #635042;padding-top:15px}
+.club-merch-card h3{font-size:16px;color:#fbe5d7}
+.club-merch-card p{font-size:13px;color:#c2b5a8;line-height:1.7;margin-top:8px}
+.club-memorial{background:#1a1918;text-align:center;border-top:1px solid #4e3b30}
+.club-memorial h2{font-size:clamp(35px,5vw,65px)}
+.club-memorial-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));gap:18px;margin-top:25px;text-align:left}
+.club-memory-entry{border-top:3px solid #f46b35;background:#24201d;padding:24px}
+.club-memory-entry h3{color:#f6ebe4}
+.club-memory-entry p{margin-top:11px;color:#c3b8af;white-space:pre-wrap}
+.club-video-section{margin-top:65px;border-top:1px solid #463931;padding-top:43px}
+.club-video-section .section-top{margin-bottom:20px}
+.club-video-section h2{font-size:clamp(36px,4vw,56px)}
+.club-video-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}
+.club-video-empty{grid-column:1/-1;font-size:14px;color:#b8b0a6;background:#24201d;border:1px dashed #615347;padding:28px}
+.club-video-card{border:1px solid #5b4539;background:#24201e;padding:24px}
+.club-video-card .eyebrow{display:block;font-size:10px;margin-bottom:12px}
+.club-video-link{color:#f9bc8e;font-size:18px;font-weight:bold;line-height:1.4;text-decoration:underline;text-underline-offset:4px}
+.club-video-card p{color:#b9b1a8;font-size:13px;margin-top:11px}
+.footer-links{display:flex;flex-wrap:wrap;gap:17px;font-size:11px}
+.footer-links a:hover,.footer-links a:focus-visible{color:#ffa16f}
+@media(max-width:800px){.club-public-info{gap:14px}.club-public-panel{padding:26px 22px}.club-news-preview{padding:19px}}
+@media(max-width:650px){.club-public-info{grid-template-columns:1fr}.club-news-heading{align-items:flex-start;flex-direction:column}.club-news-open{width:100%;min-height:42px;text-align:left}.club-news-preview{padding:17px;margin-bottom:24px}.club-public-panel{padding:25px 20px}.club-history summary{min-height:48px}.club-video-section{margin-top:45px;padding-top:35px}.footer-links{gap:12px}}
+@media(prefers-reduced-motion:reduce){.club-history[open] summary span:last-child{transform:none}}
