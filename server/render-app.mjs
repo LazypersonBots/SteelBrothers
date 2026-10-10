@@ -261,6 +261,7 @@ export function createSteelBrothersServer({
           else if(typeof data.emailOptIn!=='boolean')action={status:400,error:'Neplatná volba.'};
           else {
             await db.query('UPDATE sb_members SET email_opt_in=$1 WHERE id=$2',[data.emailOptIn,member.id]);
+            if(!data.emailOptIn)await db.query("UPDATE sb_announcement_emails SET status='cancelled' WHERE member_id=$1 AND status='queued'",[member.id]);
             action={status:200,message:'Nastavení uloženo.'};
           }
         } else action=await clubService.publish(data,member);
