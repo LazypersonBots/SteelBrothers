@@ -27,7 +27,7 @@ const routes = new Map([
   ['/signin.js', 'signin.js'], ['/email-verification.js', 'email-verification.js'],
   ['/styles.css', 'styles.css'], ['/auth.css', 'auth.css'],
   ['/steel-brothers-logo.avif', 'steel-brothers-logo.avif'],
-  ['/favicon.png', 'favicon.png']
+  ['/favicon.png', 'favicon.png'], ['/robots.txt', 'robots.txt']
 ]);
 const MIME = new Map([
   ['.html', 'text/html; charset=utf-8'],
@@ -164,7 +164,7 @@ export function createSteelBrothersServer({
   }):null;
   const adminAccess=createAdminAccess({password:env.STEELBROTHERS_ADMIN_PASSWORD,secret:env.STEELBROTHERS_VERIFICATION_SECRET,now});
   const server=createServer(async (req, res) => {
-    res.setHeader('X-Robots-Tag','noindex, nofollow, noimageindex');
+    res.setHeader('X-Robots-Tag','noindex, nofollow, noimageindex, nosnippet');
     res.setHeader('X-Content-Type-Options','nosniff');
     res.setHeader('Referrer-Policy','no-referrer');
     let url;
