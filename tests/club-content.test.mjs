@@ -32,6 +32,27 @@ test('existing homepage and gallery contain new content without replacing the la
     assert.match(html,/<meta name="googlebot" content="noindex, nofollow, noimageindex">/);
 });
 
+test('News is a standalone full-width section, separate from Activities, and still not indexed',async()=>{
+  const home=await read('index.html');
+  const css=await read('styles.css');
+  const translations=await read('language.js');
+  const activities=home.indexOf('<section class="section rides" id="rides"');
+  const news=home.indexOf('<section class="section club-news-section" id="news"');
+  const gallery=home.indexOf('<section class="section gallery" id="gallery"');
+  assert.ok(activities>=0 && news>activities && gallery>news,'News is between Activities and Gallery');
+  const activitiesMarkup=home.slice(activities,news);
+  const newsMarkup=home.slice(news,gallery);
+  assert.doesNotMatch(activitiesMarkup,/data-club-news|data-open-announcements|id="home-news-title"/);
+  assert.match(newsMarkup,/<h2 id="home-news-title">NAŠE NOVINKY\.<\/h2>/);
+  assert.match(newsMarkup,/data-club-news/);
+  assert.match(newsMarkup,/data-open-announcements/);
+  assert.match(home,/href="#news">Novinky \/ News<\/a>/);
+  assert.match(css,/\.club-news-section \.club-news-feed\{display:grid/);
+  assert.match(css,/@media\(max-width:720px\)\{\.club-news-section \.club-news-feed\{grid-template-columns:1fr\}/);
+  assert.match(translations,/"NAŠE NOVINKY\.": "OUR NEWS\."/);
+  assert.match(home,/<meta name="googlebot" content="noindex, nofollow, noimageindex">/);
+});
+
 test('unapproved editorial content defaults to empty and there are no invented events',async()=>{
   const editorial=JSON.parse(await read('club-content.json'));
   const events=JSON.parse(await read('activity-data.json'));
@@ -94,7 +115,12 @@ test('approved content is safely rendered; unapproved people and unsafe videos a
   };
   const fetch=async url=>({
     ok:true,json:async()=>url==='/club-content.json'?content:
-      {available:true,announcements:[{title:'Oznámení',body:'Novinka klubu'}]}
+      {available:true,announcements:[
+        {title:'Oznámení',body:'Novinka klubu',created_at:'2026-10-10T10:00:00Z'},
+        {title:'Novinka 2',body:'Potvrzená zpráva'},
+        {title:'Novinka 3',body:'Potvrzená zpráva 3'},
+        {title:'Novinka 4',body:'Čtvrtá zpráva by měla zůstat mimo náhled'}
+      ]}
   });
   runInNewContext(source,{document,fetch,URL,console});
   await new Promise(resolve=>setImmediate(resolve));
@@ -111,6 +137,9 @@ test('approved content is safely rendered; unapproved people and unsafe videos a
   assert.equal(videos.children.length,1);
   assert.equal(videos.children[0].children[1].href,'https://www.youtube.com/watch?v=example');
   assert.equal(news.children[0].children[0].textContent,'Oznámení');
+  assert.equal(news.children.length,3);
+  assert.equal(news.children[2].children[0].textContent,'Novinka 3');
+  assert.equal(news.children[0].children[2].dateTime,'2026-10-10T10:00:00.000Z');
   assert.equal(hours.children[0].children.length,1);
   assert.equal(socials.children.length,1);
   assert.equal(socials.children[0].rel,'noopener noreferrer');
