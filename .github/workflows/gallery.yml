@@ -33,6 +33,9 @@ jobs:
           test -s dist/announcements.css
           test -s dist/member-profile.js
           test -s dist/member-profile.css
+          test -s dist/robots.txt
+          grep -q 'Googlebot-Image' dist/robots.txt
+          test -s dist/_headers
           test -s dist/index.html
           test -s dist/gallery.js
           test -s dist/steel-brothers-logo.avif
