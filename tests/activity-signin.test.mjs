@@ -82,7 +82,7 @@ test('signup and login redirect home and club messages default to on',async()=>{
  assert.match(js,/window\.location\.replace\('\/'\)/);
  assert.match(js,/\/api\/account\//);
 });
-test('three public pages use shared profile picture dropdown and bell is read-only',async()=>{
+test('three public pages keep publishing in the profile while the bell offers admin-only deletion',async()=>{
  for(const path of ['index.html','gallery/index.html','activity/index.html']){
    const html=await read(path);
    assert.match(html,/src="\/member-profile\.js"/);
@@ -101,7 +101,8 @@ test('three public pages use shared profile picture dropdown and bell is read-on
  assert.match(profile,/\/api\/account\/logout/);
  assert.match(profile,/\/api\/announcements/);
  assert.match(profile,/user\.isAdmin/);
- assert.doesNotMatch(bell,/\/api\/admin|sb-admin-compose/);
+ assert.doesNotMatch(bell,/\/api\/admin\/unlock|sb-admin-compose/);
+ assert.match(bell,/\/api\/announcements\/delete/);
  assert.doesNotMatch(bell,/innerHTML/);
 });
 test('all four pages use the official PNG favicon, never SB letter artwork', async () => {
