@@ -6,3 +6,6 @@ node_modules/
 
 dist/
 .netlify/
+
+# Neon local project association (never commit credentials)
+.neon/
