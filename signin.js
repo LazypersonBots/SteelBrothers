@@ -1,88 +1,102 @@
 (() => {
-  const form = document.getElementById('auth-form');
-  if (!form) return;
-  const buttons = [...document.querySelectorAll('[data-mode]')];
-  const nickname = document.getElementById('nickname');
-  const nicknameField = document.getElementById('nickname-field');
-  const email = document.getElementById('email');
-  const password = document.getElementById('password');
-  const confirm = document.getElementById('confirm-password');
-  const confirmField = document.getElementById('confirm-field');
-  const verifyField = document.getElementById('verify-field');
-  const acknowledge = document.getElementById('demo-agree');
-  const acknowledgeField = document.getElementById('demo-acknowledge');
-  const heading = document.getElementById('auth-heading');
-  const subtitle = document.getElementById('auth-subtitle');
-  const submit = document.getElementById('auth-submit');
-  const feedback = document.getElementById('auth-feedback');
-  let mode = 'register';
-
-  function setMode(next) {
-    mode = next === 'login' ? 'login' : 'register';
-    const registration = mode === 'register';
-    buttons.forEach(button => button.setAttribute('aria-pressed',
-      String(button.dataset.mode === mode)));
-    nicknameField.hidden = !registration;
-    confirmField.hidden = !registration;
-    verifyField.hidden = !registration;
-    acknowledgeField.hidden = !registration;
-    nickname.required = registration;
-    confirm.required = registration;
-    acknowledge.required = registration;
-    password.autocomplete = registration ? 'new-password' : 'current-password';
-    heading.textContent = registration ? 'Vytvořit účet.' : 'Přihlásit se.';
-    subtitle.textContent = registration
-      ? 'Připoj se ke Steel Brothers. Tvorba účtů je demo, e-mail ale můžeš ověřit.'
-      : 'Vítej zpět. Přihlášení je prozatím jen interaktivní ukázka.';
-    submit.textContent = registration ? 'ZKONTROLOVAT REGISTRACI →' : 'VYZKOUŠET PŘIHLÁŠENÍ →';
-    feedback.textContent = '';
-    feedback.removeAttribute('data-status');
-    form.reset();
-    password.type = 'password';
-    confirm.type = 'password';
-    document.querySelectorAll('[data-toggle-password]').forEach(button => {
-      button.textContent = 'Zobrazit';
-      button.setAttribute('aria-pressed', 'false');
-    });
-  }
-
-  buttons.forEach(button =>
-    button.addEventListener('click', () => setMode(button.dataset.mode)));
-  document.querySelectorAll('[data-toggle-password]').forEach(button => {
-    button.addEventListener('click', () => {
-      const field = document.getElementById(button.dataset.togglePassword);
-      const show = field.type === 'password';
-      field.type = show ? 'text' : 'password';
-      button.textContent = show ? 'Skrýt' : 'Zobrazit';
-      button.setAttribute('aria-pressed', String(show));
-      button.setAttribute('aria-label', show ? 'Skrýt heslo' : 'Zobrazit heslo');
-    });
-  });
-  confirm.addEventListener('input', () => confirm.setCustomValidity(''));
-  password.addEventListener('input', () => confirm.setCustomValidity(''));
-
-  form.addEventListener('submit', event => {
-    event.preventDefault(); // Demo only: never send credentials to any server.
-    feedback.textContent = '';
-    if (mode === 'register' && confirm.value !== password.value) {
-      confirm.setCustomValidity('Hesla se musí shodovat.');
-      confirm.reportValidity();
-      return;
-    }
-    confirm.setCustomValidity('');
-    if (!form.reportValidity()) return;
-    // Never persist personal data or passwords.
-    feedback.dataset.status = 'demo';
-    const emailVerified = mode === 'register' &&
-      verifyField.dataset.verifiedEmail === email.value.trim().toLowerCase();
-    feedback.textContent = mode === 'register'
-      ? emailVerified
-        ? 'E-mail byl ověřen, ale vytvoření účtu je stále demo. Účet nebyl vytvořen.'
-        : 'Registrace je stále demo. Pro skutečné ověření e-mailu použij tlačítko Poslat kód.'
-      : 'Toto je pouze demo — nepřihlásili jsme tě a heslo se nikam neodeslalo.';
-    // Clear secrets promptly; preserve only the informational success state.
-    password.value = '';
-    confirm.value = '';
-  });
-  setMode('register');
+ const $=id=>document.getElementById(id), form=$('auth-form');
+ if(!form)return;
+ const buttons=[...document.querySelectorAll('[data-mode]')];
+ const email=$('email'),password=$('password'),confirm=$('confirm-password');
+ const nickname=$('nickname'),nickField=$('nickname-field'),verifyField=$('verify-field');
+ const confirmField=$('confirm-field'),notifyField=$('notification-opt-in');
+ const submit=$('auth-submit'),feedback=$('auth-feedback'),heading=$('auth-heading');
+ const subtitle=$('auth-subtitle'),notice=document.querySelector('.auth-demo-notice');
+ const summary=$('account-summary'),accountName=$('account-name'),accountOpt=$('account-email-opt-in');
+ const logout=$('account-logout'),footer=document.querySelector('.auth-footer-note');
+ let mode='register',available=false,busy=false;
+ const show=(text,kind='info')=>{feedback.textContent=text;feedback.dataset.status=kind;};
+ async function request(path,data) {
+   const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},
+     body:JSON.stringify(data),credentials:'same-origin'});
+   const body=await response.json();
+   if(!response.ok)throw Error(body.error||'Request failed');
+   return body;
+ }
+ function showMember(member) {
+   form.hidden=true;summary.hidden=false;
+   accountName.textContent=member.nickname+' ('+member.email+')';
+   accountOpt.checked=member.emailOptIn===true;
+   heading.textContent='Vítej v klubu.';
+   subtitle.textContent='Tvůj klubový účet je aktivní.';
+   show('');
+ }
+ function setMode(next) {
+   if(busy)return;
+   mode=next==='login'?'login':'register';
+   const reg=mode==='register';
+   buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
+   nickField.hidden=!reg;confirmField.hidden=!reg;verifyField.hidden=!reg;notifyField.hidden=!reg;
+   nickname.required=reg;confirm.required=reg;
+   password.autocomplete=reg?'new-password':'current-password';
+   heading.textContent=reg?'Vytvořit účet.':'Přihlásit se.';
+   subtitle.textContent=reg?'Ověř e-mail a vytvoř si účet Steel Brothers.':'Přihlas se svým e-mailem a heslem.';
+   submit.textContent=reg?'VYTVOŘIT ÚČET →':'PŘIHLÁSIT SE →';
+   form.reset();password.type='password';confirm.type='password';confirm.setCustomValidity('');
+   if(verifyField){delete verifyField.dataset.verifiedEmail;delete verifyField.dataset.verificationProof;}
+   show('');
+   if(!available) show('Registrace čeká na připojení samostatné databáze Neon. Účet zatím nelze vytvořit.','error');
+ }
+ buttons.forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+ document.querySelectorAll('[data-toggle-password]').forEach(b=>b.addEventListener('click',()=>{
+   const field=$(b.dataset.togglePassword),visible=field.type==='password';
+   field.type=visible?'text':'password';b.textContent=visible?'Skrýt':'Zobrazit';
+   b.setAttribute('aria-pressed',String(visible));
+ }));
+ confirm.addEventListener('input',()=>confirm.setCustomValidity(''));
+ form.addEventListener('submit',async e=>{
+   e.preventDefault();
+   if(!available||busy)return;
+   show('');
+   if(mode==='register'&&password.value!==confirm.value) {
+     confirm.setCustomValidity('Hesla se musí shodovat.');confirm.reportValidity();return;
+   }
+   confirm.setCustomValidity('');
+   if(!form.reportValidity())return;
+   if(mode==='register' && (verifyField.dataset.verifiedEmail!==email.value.trim().toLowerCase()
+       || !verifyField.dataset.verificationProof)) {
+     show('Nejdřív ověř e-mail šestimístným kódem.','error');return;
+   }
+   busy=true;submit.disabled=true;
+   try {
+     const payload=mode==='register'
+       ? {email:email.value.trim(),nickname:nickname.value.trim(),password:password.value,
+          verificationProof:verifyField.dataset.verificationProof,emailOptIn:$('email-opt-in').checked}
+       : {email:email.value.trim(),password:password.value};
+     const data=await request('/api/account/'+(mode==='register'?'register':'login'),payload);
+     password.value='';confirm.value='';
+     delete verifyField.dataset.verificationProof;
+     showMember(data.member);
+   }catch(err){show(err.message,'error');}
+   finally{busy=false;submit.disabled=false;}
+ });
+ logout.addEventListener('click',async()=>{
+   try{
+     await request('/api/account/logout',{});
+     summary.hidden=true;form.hidden=false;setMode('login');
+   }catch(err){show(err.message,'error');}
+ });
+ accountOpt.addEventListener('change',async()=>{
+   try{await request('/api/account/preferences',{emailOptIn:accountOpt.checked});}
+   catch(err){show(err.message,'error');accountOpt.checked=!accountOpt.checked;}
+ });
+ async function init() {
+   try {
+     const [state,res]=await Promise.all([fetch('/api/account/status').then(r=>r.json()),
+       fetch('/api/account/me').then(r=>r.json())]);
+     available=state.available===true;
+     if(notice)notice.textContent=available?'KLUBOVÉ ÚČTY JSOU AKTIVNÍ':'REGISTRACE ČEKÁ NA DATABÁZI NEON';
+     if(footer)footer.textContent=available
+       ? 'Hesla jsou šifrovaně odvozena a uložena na serveru. E-mailová oznámení jsou volitelná.'
+       : 'Registrace zatím není dostupná. Nejprve připoj databázi Neon k Render.';
+     submit.disabled=!available;
+     if(res.member)showMember(res.member); else setMode('register');
+   }catch{available=false;submit.disabled=true;show('Nelze se spojit se službou účtů.','error');}
+ }
+ setMode('register');init();
 })();
