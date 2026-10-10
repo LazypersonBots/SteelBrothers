@@ -166,7 +166,7 @@ export function createClubService({db,secret,sendCodeEmail,sendClubEmail,now=Dat
  async function deleteAnnouncement(id,member){
    if(!member||!ADMIN_EMAILS.has(member.email)||member.email_verified!==true||!member.verified_at)
      return fail(403,'Oznámení mohou mazat pouze ověření správci klubu.');
-   if(typeof id!=='string'||!/^[1-9]\\d{0,18}$/.test(id)||BigInt(id)>9223372036854775807n)
+   if(typeof id!=='string'||!/^[1-9][0-9]{0,18}$/.test(id)||BigInt(id)>9223372036854775807n)
      return fail(400,'Neplatné ID oznámení.');
    // Database cascade removes related email delivery rows too.
    const deleted=await db.query('DELETE FROM sb_announcements WHERE id=$1 RETURNING id',[id]);
