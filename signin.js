@@ -4,11 +4,13 @@
  const buttons=[...document.querySelectorAll('[data-mode]')];
  const email=$('email'),password=$('password'),confirm=$('confirm-password');
  const nickname=$('nickname'),nickField=$('nickname-field'),verifyField=$('verify-field');
- const confirmField=$('confirm-field'),notifyField=$('notification-opt-in');
+ const confirmField=$('confirm-field');
  const submit=$('auth-submit'),feedback=$('auth-feedback'),heading=$('auth-heading');
  const subtitle=$('auth-subtitle'),notice=document.querySelector('.auth-demo-notice');
  const summary=$('account-summary'),accountName=$('account-name'),accountOpt=$('account-email-opt-in');
  const logout=$('account-logout'),footer=document.querySelector('.auth-footer-note');
+ const mailStatus=$('account-mail-status');
+ let optedIn=false;
  let mode='register',available=false,busy=false;
  const show=(text,kind='info')=>{feedback.textContent=text;feedback.dataset.status=kind;};
  async function request(path,data) {
@@ -21,17 +23,24 @@
  function showMember(member) {
    form.hidden=true;summary.hidden=false;
    accountName.textContent=member.nickname+' ('+member.email+')';
-   accountOpt.checked=member.emailOptIn===true;
+   optedIn=member.emailOptIn===true;
+   syncMailButton();
+   document.dispatchEvent(new CustomEvent('sb:member-ready',{detail:{admin:member.isAdmin===true}}));
    heading.textContent='Vítej v klubu.';
    subtitle.textContent='Tvůj klubový účet je aktivní.';
    show('');
+ }
+ function syncMailButton(){
+   accountOpt.textContent=optedIn?'VYPNOUT E-MAILY':'ZAPNOUT E-MAILY';
+   accountOpt.setAttribute('aria-pressed',String(optedIn));
+   mailStatus.textContent=optedIn?'Dostáváš klubové e-maily.':'Klubové e-maily jsou vypnuté.';
  }
  function setMode(next) {
    if(busy)return;
    mode=next==='login'?'login':'register';
    const reg=mode==='register';
    buttons.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
-   nickField.hidden=!reg;confirmField.hidden=!reg;verifyField.hidden=!reg;notifyField.hidden=!reg;
+   nickField.hidden=!reg;confirmField.hidden=!reg;verifyField.hidden=!reg;
    nickname.required=reg;confirm.required=reg;
    password.autocomplete=reg?'new-password':'current-password';
    heading.textContent=reg?'Vytvořit účet.':'Přihlásit se.';
@@ -66,7 +75,7 @@
    try {
      const payload=mode==='register'
        ? {email:email.value.trim(),nickname:nickname.value.trim(),password:password.value,
-          verificationProof:verifyField.dataset.verificationProof,emailOptIn:$('email-opt-in').checked}
+          verificationProof:verifyField.dataset.verificationProof}
        : {email:email.value.trim(),password:password.value};
      const data=await request('/api/account/'+(mode==='register'?'register':'login'),payload);
      password.value='';confirm.value='';
@@ -78,12 +87,17 @@
  logout.addEventListener('click',async()=>{
    try{
      await request('/api/account/logout',{});
-     summary.hidden=true;form.hidden=false;setMode('login');
+     summary.hidden=true;form.hidden=false;
+     document.dispatchEvent(new CustomEvent('sb:member-ready',{detail:{admin:false}}));
+     setMode('login');
    }catch(err){show(err.message,'error');}
  });
- accountOpt.addEventListener('change',async()=>{
-   try{await request('/api/account/preferences',{emailOptIn:accountOpt.checked});}
-   catch(err){show(err.message,'error');accountOpt.checked=!accountOpt.checked;}
+ accountOpt.addEventListener('click',async()=>{
+   const next=!optedIn;
+   accountOpt.disabled=true;
+   try{await request('/api/account/preferences',{emailOptIn:next});optedIn=next;syncMailButton();}
+   catch(err){mailStatus.textContent=err.message;}
+   finally{accountOpt.disabled=false;}
  });
  async function init() {
    try {
@@ -92,7 +106,7 @@
      available=state.available===true;
      if(notice)notice.textContent=available?'KLUBOVÉ ÚČTY JSOU AKTIVNÍ':'REGISTRACE ČEKÁ NA DATABÁZI NEON';
      if(footer)footer.textContent=available
-       ? 'Hesla jsou šifrovaně odvozena a uložena na serveru. E-mailová oznámení jsou volitelná.'
+       ? 'Klubové e-maily můžeš kdykoli zapnout v nastavení svého účtu.'
        : 'Registrace zatím není dostupná. Nejprve připoj databázi Neon k Render.';
      submit.disabled=!available;
      if(res.member)showMember(res.member); else setMode('register');
