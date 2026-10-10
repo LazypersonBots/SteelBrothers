@@ -5,7 +5,7 @@
   const isHome = container.dataset.activityList === 'home';
   const next = document.querySelector('[data-next-event]');
   const dateFormat = value => new Intl.DateTimeFormat(
-    window.SteelI18n?.lang === 'en' ? 'en-GB' : 'cs-CZ', {
+    globalThis.window?.SteelI18n?.lang === 'en' ? 'en-GB' : 'cs-CZ', {
       day: 'numeric', month: 'long', year: 'numeric',
       hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Prague'
     }).format(new Date(value));
