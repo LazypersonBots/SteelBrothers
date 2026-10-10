@@ -7,7 +7,7 @@ const SCHEMA=[
 'CREATE TABLE IF NOT EXISTS club_sessions (token_hash TEXT PRIMARY KEY,member_id BIGINT NOT NULL REFERENCES club_members(id) ON DELETE CASCADE,expires_at TIMESTAMPTZ NOT NULL)',
 'CREATE INDEX IF NOT EXISTS club_sessions_member ON club_sessions(member_id)',
 'CREATE TABLE IF NOT EXISTS club_announcements (id BIGSERIAL PRIMARY KEY,title VARCHAR(120) NOT NULL,body TEXT NOT NULL,author_id BIGINT NOT NULL REFERENCES club_members(id),sent_email BOOLEAN NOT NULL DEFAULT FALSE,created_at TIMESTAMPTZ NOT NULL DEFAULT now())',
-'CREATE TABLE IF NOT EXISTS club_announcement_deliveries (announcement_id BIGINT NOT NULL REFERENCES club_announcements(id) ON DELETE CASCADE,member_id BIGINT NOT NULL REFERENCES club_members(id) ON DELETE CASCADE,status VARCHAR(16) NOT NULL DEFAULT \\'claimed\\',PRIMARY KEY (announcement_id,member_id))'
+"CREATE TABLE IF NOT EXISTS club_announcement_deliveries (announcement_id BIGINT NOT NULL REFERENCES club_announcements(id) ON DELETE CASCADE, member_id BIGINT NOT NULL REFERENCES club_members(id) ON DELETE CASCADE, status VARCHAR(16) NOT NULL DEFAULT 'claimed', PRIMARY KEY (announcement_id,member_id))"
 ];
 export async function openClubDB(env=process.env,logger=console){
  const url=env.STEELBROTHERS_DATABASE_URL;
