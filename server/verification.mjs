@@ -104,7 +104,7 @@ export function apiResponse(status, data) {
   });
 }
 
-export async function readEmailPayload(request, fields, allowedOrigins = ['https://steelbrothers.cz', 'https://www.steelbrothers.cz']) {
+export async function readEmailPayload(request, fields, allowedOrigins = ['https://steelbrothers.cz', 'https://www.steelbrothers.cz'], maxLength = 2048) {
   if (request.method !== 'POST') return { error: apiResponse(405, { error: 'Method not allowed' }) };
   if (!request.headers.get('content-type')?.toLowerCase().startsWith('application/json')) {
     return { error: apiResponse(415, { error: 'Expected application/json' }) };
@@ -115,7 +115,7 @@ export async function readEmailPayload(request, fields, allowedOrigins = ['https
   }
   try {
     const source = await request.text();
-    if (source.length > 2048) return { error: apiResponse(413, { error: 'Request too large' }) };
+    if (source.length > maxLength) return { error: apiResponse(413, { error: 'Request too large' }) };
     const json = JSON.parse(source);
     if (!json || Array.isArray(json) || typeof json !== 'object' ||
         Object.keys(json).some(k => !fields.includes(k))) {
