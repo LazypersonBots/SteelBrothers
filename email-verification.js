@@ -1,5 +1,4 @@
-/* Sends and validates real Resend email codes via Netlify Functions.
-   This is email verification only; it does not create member accounts. */
+/* Persistent Resend codes. Registration proof is server-issued and consumed once. */
 (() => {
   const $ = id => document.getElementById(id);
   const email = $('email');
@@ -25,6 +24,7 @@
     code.value = '';
     panel.hidden = true;
     delete field.dataset.verifiedEmail;
+    delete field.dataset.verificationProof;
     send.textContent = 'POSLAT KÓD →';
     send.disabled = !available;
     verify.disabled = false;
@@ -87,11 +87,12 @@
       const result = await callApi('/api/email/verify', { email: pendingEmail, code: token });
       if (!result.verified) throw new Error('Ověření se nepodařilo.');
       field.dataset.verifiedEmail = pendingEmail;
+      if(result.verificationProof)field.dataset.verificationProof=result.verificationProof;
       panel.hidden = true;
       code.value = '';
       send.disabled = true;
       send.textContent = 'E-MAIL OVĚŘEN ✓';
-      show('✓ E-mail byl skutečně ověřen! Tvorba účtů je zatím demo.', 'success');
+      show('✓ E-mail ověřen. Teď můžeš vytvořit účet.', 'success');
     } catch (error) {
       code.value = '';
       show(error.message || 'Nesprávný kód.', 'error');
@@ -104,11 +105,11 @@
   fetch('/api/email/send', { cache: 'no-store' })
     .then(response => response.json())
     .then(data => {
-      available = data.available === true;
+      available = data.available === true && data.accountCreation === true;
       send.disabled = !available;
       show(available
         ? 'Ověřování e-mailu je připravené. Zadej adresu a klikni „Poslat kód“.'
-        : 'Ověřování se aktivuje po přidání Resend API klíče do Netlify.',
+        : 'Ověřování pro klubové účty čeká na připojení databáze Neon v Render.',
         available ? 'success' : 'info');
     })
     .catch(() => {
