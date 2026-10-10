@@ -1,0 +1,40 @@
+/* Unified account / avatar menu on Steel Brothers public pages. */
+.sb-member-slot{position:relative;margin-left:auto;z-index:115}
+.sb-member-trigger{border:1px solid #665044;background:#282320;color:#f9eee6;border-radius:28px;padding:6px 11px 6px 6px;display:flex;align-items:center;gap:9px;cursor:pointer;font-size:12px;font-weight:800;max-width:205px}
+.sb-member-trigger[hidden],.sb-profile-popover[hidden],.sb-profile-body[hidden],.sb-profile-tabs button[hidden],#sb-admin-locked[hidden],#sb-admin-unlocked[hidden]{display:none!important}
+.sb-member-trigger:hover,.sb-member-trigger:focus-visible{border-color:#f46b35;outline-offset:3px}
+.sb-trigger-name{max-width:108px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-avatar{background:linear-gradient(140deg,#ee7b45,#763a28);border-radius:50%;display:grid;place-items:center;color:#170e09;font-weight:900;flex-shrink:0;overflow:hidden}
+.sb-avatar img{display:block;width:100%;height:100%;object-fit:cover}
+.sb-trigger-avatar{width:34px;height:34px;font-size:13px}
+.sb-profile-avatar{width:54px;height:54px;font-size:19px}
+.sb-profile-popover{position:absolute;right:0;top:calc(100% + 14px);width:min(365px,calc(100vw - 22px));max-height:calc(100dvh - 96px);overflow:auto;color:#f6eae0;background:#1e1b19;border:1px solid #6f4e37;border-top:3px solid #f46b35;box-shadow:0 16px 55px #000c;border-radius:10px;padding:18px;font-family:Arial,Helvetica,sans-serif;font-size:12px}
+.sb-profile-top{display:flex;align-items:center;gap:11px;border-bottom:1px solid #594538;padding-bottom:17px}
+.sb-profile-top>div{min-width:0;flex:1}
+.sb-profile-nickname{display:block;max-width:195px;overflow:hidden;text-overflow:ellipsis;font-size:15px;color:#fff}
+.sb-profile-email{display:block;color:#ae9e92;font-size:11px;word-break:break-all;margin-top:4px}
+#sb-profile-close{align-self:flex-start;border:none;background:#342c27;border-radius:5px;color:#fff;width:29px;height:29px;font-size:23px;cursor:pointer}
+.sb-profile-tabs{display:flex;gap:3px;border-bottom:1px solid #524033;padding:13px 0}
+.sb-profile-tabs button{flex:1;border:1px solid transparent;border-radius:5px;background:none;color:#c4b1a2;padding:9px 4px;font:800 10px Arial,sans-serif;letter-spacing:.6px;cursor:pointer}
+.sb-profile-tabs button[aria-pressed=true]{border-color:#985c37;background:#483024;color:#fff}
+.sb-profile-tabs button:hover{color:#fff}
+.sb-profile-body{padding:18px 0 4px;display:flex;flex-direction:column;gap:11px}
+.sb-profile-body h3{font:800 17px Arial,sans-serif;color:#f9e7db}
+.sb-profile-body p{line-height:1.5;color:#cfbcb0;font-size:12px}
+.sb-profile-body input:not([type=file]),.sb-profile-body textarea{width:100%;background:#131211;border:1px solid #71523e;border-radius:6px;color:#fff;padding:11px;font:13px Arial,sans-serif;min-width:0;resize:vertical}
+.sb-profile-body input[type=file]{font-size:11px;max-width:100%;color:#c4b1a2}
+.sb-profile-body form{display:flex;flex-direction:column;gap:10px}
+.sb-profile-body label{color:#eee0d5;font-size:11px;font-weight:800}
+.sb-profile-body hr{border:none;border-top:1px solid #4f3d34;width:100%;margin:8px 0}
+.sb-profile-secondary{border:1px solid #9a6541;background:#30251f;color:#ffd4b9;padding:11px;border-radius:6px;cursor:pointer;font-weight:800;font-size:11px}
+.sb-profile-primary{border:none;background:#f46b35;color:#1c100a;padding:12px;border-radius:6px;font-weight:900;font-size:11px;cursor:pointer}
+.sb-profile-primary:disabled{opacity:.5;cursor:wait}
+.sb-profile-muted{color:#b4a394!important;font-size:11px!important}
+.sb-admin-ready{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#b5e6b3;font-size:11px;font-weight:800;margin:4px 0}
+#sb-admin-lock{border:1px solid #8d6b53;background:transparent;color:#f4c5aa;padding:6px 9px;border-radius:5px;cursor:pointer}
+#sb-profile-feedback{color:#eeb493;font-size:12px;min-height:16px;line-height:1.5;padding-top:7px}
+#sb-profile-feedback[data-status=success]{color:#a7deaf}
+#sb-profile-feedback[data-status=error]{color:#ffa290}
+.sb-profile-logout{display:block;width:100%;border:1px solid #665047;border-radius:6px;background:#28201d;color:#f4d0bc;padding:11px;cursor:pointer;font:800 11px Arial,sans-serif;margin-top:8px}
+.sb-bell{top:auto!important;bottom:18px!important;right:18px!important}
+@media(max-width:750px){.sb-member-slot{margin-left:0}.header{flex-wrap:wrap;gap:12px}.sb-member-trigger{padding:4px 9px 4px 4px}.sb-profile-popover{position:fixed;right:9px;top:84px;max-height:calc(100dvh - 92px)}.sb-bell{bottom:14px!important;right:12px!important}}
