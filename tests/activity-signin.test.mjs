@@ -71,7 +71,7 @@ test('both activity and gallery have working return and navigation links', async
   assert.match(home,/href="\/signin\/">PŘIDAT SE/);
   assert.match(activity,/href="\/"[^>]*>← ZPĚT NA HLAVNÍ STRÁNKU/);
   assert.match(activity,/data-activity-list="all"/);
-  assert.match(gallery,/href="\/activity\/">Aktivity/);
+  assert.match(gallery,/href="\/activity\/">Akce \/ Events/);
 });
 
 test('signup and login redirect home and club messages default to on',async()=>{
