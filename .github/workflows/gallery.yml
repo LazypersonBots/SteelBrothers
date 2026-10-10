@@ -31,6 +31,8 @@ jobs:
           test -s dist/announcements.js
           test -s dist/club-admin.js
           test -s dist/announcements.css
+          test -s dist/member-profile.js
+          test -s dist/member-profile.css
           test -s dist/index.html
           test -s dist/gallery.js
           test -s dist/steel-brothers-logo.avif

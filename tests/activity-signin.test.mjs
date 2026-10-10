@@ -70,54 +70,40 @@ test('both activity and gallery have working return and navigation links', async
   assert.match(gallery,/href="\/activity\/">Aktivity/);
 });
 
-test('signin creates actual accounts only after server email proof', async () => {
-  const page=await read('signin/index.html');
-  const js=await read('signin.js');
-  const otp=await read('email-verification.js');
-  assert.match(page,/id="email"[^>]+type="email" required/);
-  assert.match(page,/id="nickname"[^>]+required/);
-  assert.match(page,/id="password"[^>]+type="password" required minlength="10"/);
-  assert.match(page,/id="confirm-password"[^>]+required/);
-  assert.match(page,/id="send-email-code"/);
-  assert.doesNotMatch(page,/id="email-opt-in"/);
-  assert.doesNotMatch(page,/id="notification-opt-in"/);
-  assert.match(page,/id="account-email-opt-in"/);
-  assert.match(page,/id="club-admin"[^>]*hidden/);
-  assert.match(page,/id="club-admin-compose"/);
-  assert.match(page,/src="\/club-admin\.js"/);
-  assert.match(page,/id="account-summary"/);
-  assert.doesNotMatch(page,/DEMO ÚČTY|účet nebude vytvořen/);
-  assert.match(js,/\/api\/account\//);
-  assert.match(js,/mode==='register'\?'register':'login'/);
-  assert.match(js,/verificationProof/);
-  assert.match(js,/\/api\/account\//);
-  assert.match(js,/\/api\/account\/logout/);
-  assert.match(js,/\/api\/account\/preferences/);
-  assert.match(otp,/result\.verificationProof/);
-  assert.doesNotMatch(js,/localStorage/);
+test('signup and login redirect home and club messages default to on',async()=>{
+ const page=await read('signin/index.html'),js=await read('signin.js');
+ assert.match(page,/id="email"[^>]+type="email" required/);
+ assert.match(page,/id="nickname"[^>]+required/);
+ assert.match(page,/id="send-email-code"/);
+ assert.match(page,/Vytvořením účtu budeš dostávat klubové e-maily/);
+ assert.doesNotMatch(page,/id="account-summary"|id="club-admin"|src="\/club-admin\.js"/);
+ assert.match(js,/verificationProof/);
+ assert.match(js,/window\.location\.assign\('\/'\)/);
+ assert.match(js,/window\.location\.replace\('\/'\)/);
+ assert.match(js,/\/api\/account\//);
 });
-
-test('announcement bell, accessible modal and admin-only composer appear on every page',async()=>{
-  for(const path of ['index.html','signin/index.html','gallery/index.html','activity/index.html']){
-    const page=await read(path);
-    assert.match(page,/src="\/announcements\.js"/);
-    assert.match(page,/href="\/announcements\.css"/);
-    assert.match(page,/id="sb-bell"/);
-    assert.match(page,/id="sb-notices"/);
-    assert.match(page,/role="dialog"/);
-    assert.doesNotMatch(page,/id="sb-notice-compose"/);
-    assert.doesNotMatch(page,/id="sb-notice-send-email"/);
-  }
-  const js=await read('announcements.js');
-  assert.match(js,/\/api\/announcements/);
-  const admin=await read('club-admin.js');
-  assert.match(admin,/member\?\.isAdmin===true/);
-  assert.match(admin,/\/api\/announcements/);
-  assert.doesNotMatch(js,/\/api\/account\/me/);
-  assert.match(js,/textContent/);
-  assert.doesNotMatch(js,/innerHTML/);
+test('three public pages use shared profile picture dropdown and bell is read-only',async()=>{
+ for(const path of ['index.html','gallery/index.html','activity/index.html']){
+   const html=await read(path);
+   assert.match(html,/src="\/member-profile\.js"/);
+   assert.match(html,/href="\/member-profile\.css"/);
+   assert.match(html,/id="sb-bell"/);
+   assert.doesNotMatch(html,/id="sb-notice-compose"/);
+ }
+ const profile=await read('member-profile.js');
+ const bell=await read('announcements.js');
+ assert.match(profile,/sb-member-trigger/);
+ assert.match(profile,/sb-profile-settings/);
+ assert.match(profile,/sb-admin-unlock-form/);
+ assert.match(profile,/\/api\/admin\/unlock/);
+ assert.match(profile,/\/api\/account\/avatar/);
+ assert.match(profile,/\/api\/account\/preferences/);
+ assert.match(profile,/\/api\/account\/logout/);
+ assert.match(profile,/\/api\/announcements/);
+ assert.match(profile,/user\.isAdmin/);
+ assert.doesNotMatch(bell,/\/api\/admin|sb-admin-compose/);
+ assert.doesNotMatch(bell,/innerHTML/);
 });
-
 test('all four pages use the official PNG favicon, never SB letter artwork', async () => {
   const pages = ['index.html', 'gallery/index.html', 'activity/index.html', 'signin/index.html'];
   for (const path of pages) {
@@ -168,7 +154,7 @@ test('Netlify and local preview serve both secondary pages', async () => {
     assert.ok(preview.includes("['/" + slug + "', '" + slug + "/index.html']"));
     assert.ok(build.includes("join(output, '" + slug + "')"));
   }
-  for (const name of ['activity.js','activity-data.json','signin.js','email-verification.js','auth.css','announcements.js','announcements.css','club-admin.js','favicon.png']) {
+  for (const name of ['activity.js','activity-data.json','signin.js','email-verification.js','auth.css','announcements.js','announcements.css','club-admin.js','member-profile.js','member-profile.css','favicon.png']) {
     assert.ok(build.includes("'" + name + "'"));
   }
 });

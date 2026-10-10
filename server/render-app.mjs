@@ -7,11 +7,13 @@ import { renderVerificationEmail } from './email-template.mjs';
 import { createVerificationMemoryStore } from './render-memory-store.mjs';
 import { createClubService } from './club-service.mjs';
 import { ADMIN_EMAILS } from './club-db.mjs';
+import { createAdminAccess, clearAdminCookie, isVerifiedClubAdmin } from './admin-access.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const routes = new Map([
   ['/', 'index.html'], ['/index.html', 'index.html'],
   ['/announcements.js', 'announcements.js'], ['/announcements.css', 'announcements.css'],
+  ['/member-profile.js','member-profile.js'],['/member-profile.css','member-profile.css'],
   ['/club-admin.js', 'club-admin.js'],
   ['/gallery', 'gallery/index.html'], ['/gallery/', 'gallery/index.html'],
   ['/gallery/index.html', 'gallery/index.html'],
@@ -56,12 +58,12 @@ function makeRateLimiter(now = Date.now) {
   };
 }
 
-async function toWebRequest(req, url) {
+async function toWebRequest(req, url, maxBytes = 8192) {
   const chunks = [];
   let length = 0;
   for await (const chunk of req) {
     length += chunk.length;
-    if (length > 8192) {
+    if (length > maxBytes) {
       const error = new Error('Request too large');
       error.status = 413;
       throw error;
@@ -160,6 +162,7 @@ export function createSteelBrothersServer({
       if(!response.ok)throw Error('Club email provider error: '+response.status);
     }
   }):null;
+  const adminAccess=createAdminAccess({password:env.STEELBROTHERS_ADMIN_PASSWORD,secret:env.STEELBROTHERS_VERIFICATION_SECRET,now});
   const server=createServer(async (req, res) => {
     res.setHeader('X-Robots-Tag','noindex, nofollow, noimageindex');
     res.setHeader('X-Content-Type-Options','nosniff');
@@ -218,14 +221,62 @@ export function createSteelBrothersServer({
       return;
     }
 
+    if(url.pathname==='/api/admin/status' && req.method==='GET') {
+      try {
+        const member=clubService?await clubService.current(req.headers.cookie):null;
+        await sendHttpResponse(res,apiResponse(200,{
+          eligible:isVerifiedClubAdmin(member),
+          passwordConfigured:adminAccess.configured,
+          unlocked:adminAccess.unlocked(member,req.headers.cookie)
+        }));
+      }catch{await sendHttpResponse(res,apiResponse(503,{error:'Kontrola přístupu není dostupná.'}));}
+      return;
+    }
+    if(url.pathname==='/api/admin/unlock' || url.pathname==='/api/admin/lock'){
+      if(req.method!=='POST'){await sendHttpResponse(res,apiResponse(405,{error:'Method not allowed'}));return;}
+      try{
+        const member=clubService?await clubService.current(req.headers.cookie):null;
+        if(!isVerifiedClubAdmin(member)){
+          await sendHttpResponse(res,apiResponse(403,{error:'Přístup pouze pro ověřené správce klubu.'}));return;
+        }
+        if(url.pathname==='/api/admin/lock'){
+          const output=apiResponse(200,{unlocked:false});
+          output.headers.set('Set-Cookie',clearAdminCookie);
+          await sendHttpResponse(res,output);return;
+        }
+        if(!adminAccess.configured){
+          await sendHttpResponse(res,apiResponse(503,{error:'Heslo administrace není nastavené na serveru.'}));return;
+        }
+        const ip=(req.headers['x-forwarded-for']||req.socket.remoteAddress||'unknown').toString().split(',')[0].trim().slice(0,70);
+        if(rateLimit('admin-unlock:'+ip,5,15*60_000)){
+          await sendHttpResponse(res,apiResponse(429,{error:'Příliš mnoho pokusů. Zkus to za 15 minut.'}));return;
+        }
+        const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname,url.pathname==='/api/account/avatar'?105000:8192);
+        const {data,error}=await readEmailPayload(request,['password'],allowedOrigins);
+        if(error){await sendHttpResponse(res,error);return;}
+        if(!adminAccess.verifyPassword(data.password)){
+          await sendHttpResponse(res,apiResponse(403,{error:'Nesprávné heslo administrace.'}));return;
+        }
+        const cookie=adminAccess.grant(member,req.headers.cookie);
+        if(!cookie){await sendHttpResponse(res,apiResponse(403,{error:'Přihlášení vypršelo.'}));return;}
+        const output=apiResponse(200,{unlocked:true});
+        output.headers.set('Set-Cookie',cookie);
+        await sendHttpResponse(res,output);
+      }catch(e){
+        log.error('Admin unlock error:',e?.name||'unknown');
+        await sendHttpResponse(res,apiResponse(503,{error:'Správa účtu není dostupná.'}));
+      }
+      return;
+    }
+
     if(url.pathname==='/api/account/status' && req.method==='GET') {
       await sendHttpResponse(res,apiResponse(200,{available:!!clubService}));return;
     }
     if(url.pathname==='/api/account/me' && req.method==='GET') {
       const member=clubService?await clubService.current(req.headers.cookie):null;
       await sendHttpResponse(res,apiResponse(200,{member:member?{
-        email:member.email,nickname:member.nickname,emailOptIn:member.email_opt_in,
-        isAdmin:ADMIN_EMAILS.has(member.email) && member.email_verified===true && !!member.verified_at
+        email:member.email,nickname:member.nickname,emailOptIn:member.email_opt_in,avatarData:member.avatar_data||null,
+        isAdmin:isVerifiedClubAdmin(member)
       }:null}));return;
     }
     if(url.pathname==='/api/announcements' && req.method==='GET') {
@@ -236,7 +287,7 @@ export function createSteelBrothersServer({
       } catch { await sendHttpResponse(res,apiResponse(503,{error:'Oznámení nejsou dostupná.'})); }
       return;
     }
-    if(['/api/account/register','/api/account/login','/api/account/logout','/api/account/preferences','/api/announcements'].includes(url.pathname)) {
+    if(['/api/account/register','/api/account/login','/api/account/logout','/api/account/preferences','/api/account/avatar','/api/announcements'].includes(url.pathname)) {
       if(req.method!=='POST'){await sendHttpResponse(res,apiResponse(405,{error:'Method not allowed'}));return;}
       if(!clubService){await sendHttpResponse(res,apiResponse(503,{error:'Účty čekají na připojení databáze Neon.'}));return;}
       const address=(req.headers['x-forwarded-for']||req.socket.remoteAddress||'unknown').toString().split(',')[0].trim().slice(0,70);
@@ -245,13 +296,14 @@ export function createSteelBrothersServer({
         await sendHttpResponse(res,apiResponse(429,{error:'Počkej chvíli a zkus to znovu.'}));return;
       }
       try{
-        const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname);
+        const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname,url.pathname==='/api/account/avatar'?105000:8192);
         const fields=url.pathname.endsWith('/register')?['email','nickname','password','verificationProof']
           :url.pathname.endsWith('/login')?['email','password']
           :url.pathname.endsWith('/preferences')?['emailOptIn']
+          :url.pathname.endsWith('/avatar')?['avatarData']
           :url.pathname==='/api/announcements'?['title','body','emailEveryone']:[];
         const {data,error}=await readEmailPayload(request,fields,allowedOrigins,
-          url.pathname==='/api/announcements'?8192:2048);
+          url.pathname==='/api/announcements'?8192:url.pathname==='/api/account/avatar'?105000:2048);
         if(error){await sendHttpResponse(res,error);return;}
         const member=await clubService.current(req.headers.cookie);
         let action;
@@ -266,10 +318,14 @@ export function createSteelBrothersServer({
             if(!data.emailOptIn)await db.query("UPDATE sb_announcement_emails SET status='cancelled' WHERE member_id=$1 AND status='queued'",[member.id]);
             action={status:200,message:'Nastavení uloženo.'};
           }
-        } else action=await clubService.publish(data,member);
+        } else if(url.pathname.endsWith('/avatar'))action=await clubService.updateAvatar(member,data.avatarData);
+        else action=adminAccess.unlocked(member,req.headers.cookie)
+          ? await clubService.publish(data,member)
+          : {status:403,error:'Pro zveřejnění otevři profil a odemkni administraci heslem.'};
         const {setCookie,status,...body}=action;
         const response=apiResponse(status,body);
         if(setCookie)response.headers.set('Set-Cookie',setCookie);
+        if(url.pathname==='/api/account/logout')response.headers.append('Set-Cookie',clearAdminCookie);
         await sendHttpResponse(res,response);
         if(status===201&&url.pathname==='/api/announcements'&&action.emailsQueued){
           setImmediate(()=>clubService.sendPending(25).catch(()=>{}));

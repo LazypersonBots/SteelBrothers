@@ -153,8 +153,35 @@ or invalid, registration and announcing are disabled rather than saved in RAM.
   with individual salts. Sessions are HttpOnly, Secure, and SameSite=Lax.
 - Only signed-in, verified owner emails can post announcements and optionally
   email club subscribers. The bell is a popup on all four pages.
-- Bulk emails go only to members who **explicitly opted in**; members can
-  unsubscribe via the account preferences checkbox.
+- New verified member accounts receive club email notices by default; this is
+  disclosed on the registration page. Existing members keep their saved preference.
+  Members can disable notices under Profile → Settings without losing membership.
 - The email delivery queue is saved in Neon and retried after restarts. Free
   Render sleep can delay notifications; emails can still require monitoring.
 - Emails go through the existing SteelBrothers Resend domain.
+
+## Profile menu and password-protected admin console
+
+After successful registration or login, the browser returns to the home page.
+The header shows the signed-in nickname and an avatar (initials by default);
+profile settings allow uploading a 128×128 WebP avatar stored in the dedicated
+Neon member record, disabling/re-enabling club emails, or logging out.
+
+The bell is a read-only popup for visitors and members. Only the two verified
+admin email accounts get an Admin tab in their profile popup, and **the tab
+cannot publish without a second, separate admin password**.
+
+To enable admin publishing add a Render Environment variable:
+
+- `STEELBROTHERS_ADMIN_PASSWORD`: a **different** strong password (at least
+  12 characters; 20+ recommended) chosen and saved privately by the owner.
+
+Do not place the admin password in source control, send it in chat, reuse a user
+account password, or expose it client-side. Saving it will trigger Render
+deployment. Without it, the Admin tab safely remains locked. After entering the
+password, a signed, 20-minute, login-session-bound admin cookie grants publishing
+access; passwords have five attempts per IP per 15 minutes.
+
+Creating an announcement publishes it in the bell and queues Resend notification
+emails for members whose club email setting is **on**. Newly registered members
+start with that setting on, and can opt out immediately after registering.

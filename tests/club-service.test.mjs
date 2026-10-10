@@ -36,18 +36,23 @@ function memoryDB() {
       Object.assign(verification.get(p[0]),{state:'consumed',proof_hash:null});return {rows:[]};
     }
     if(sql.startsWith('INSERT INTO sb_members')){
-      const person={id:++sequence,email:p[0],nickname:p[1],password_hash:p[2],email_opt_in:false,verified_at:new Date()};
+      const person={id:++sequence,email:p[0],nickname:p[1],password_hash:p[2],email_opt_in:true,avatar_data:null,verified_at:new Date()};
       members.set(p[0],person);return {rows:[person]};
     }
     if(sql.startsWith('INSERT INTO sb_sessions')){
       sessions.set(p[0],{memberId:p[1],expiresAt:p[2]});return {rows:[]};
     }
-    if(sql.startsWith('SELECT m.id,m.email,m.nickname,m.email_opt_in,m.verified_at,EXISTS')){
+    if(sql.startsWith('SELECT m.id,m.email,m.nickname,m.email_opt_in,m.avatar_data,m.verified_at,EXISTS')){
       const session=sessions.get(p[0]);
       const member=[...members.values()].find(x=>x.id===session?.memberId);
       return {rows:member?[{...member,email_verified:(verification.get(member.email)?.verification_count||0)>0}]:[]};
     }
     if(sql.startsWith('DELETE FROM sb_sessions')){sessions.delete(p[0]);return {rows:[]};}
+    if(sql.startsWith('UPDATE sb_members SET avatar_data=')){
+      const member=[...members.values()].find(x=>x.id===p[1]);
+      if(member)member.avatar_data=p[0];
+      return {rows:[]};
+    }
     if(sql.startsWith('INSERT INTO sb_announcements')){
       const item={id:++sequence,title:p[0],body:p[1],author_id:p[2],created_at:new Date()};
       announcements.push(item);return {rows:[item]};
@@ -84,7 +89,7 @@ test('ordinary email can verify only once, verified proof can create one real ac
   const account=await service.register({email:'member@example.com',nickname:'Rider',
     password:'correct-password-123',verificationProof:verified.verificationProof,emailOptIn:true});
   assert.equal(account.status,201);
-  assert.equal(account.member.emailOptIn,false);
+  assert.equal(account.member.emailOptIn,true);
   assert.match(db.members.get('member@example.com').password_hash,/^scrypt\$/);
   assert.doesNotMatch(db.members.get('member@example.com').password_hash,/correct-password/);
   assert.equal((await service.register({email:'member@example.com',nickname:'Other',
@@ -135,6 +140,7 @@ test('publishing requires verified admin, not merely an admin email string',asyn
   });
   assert.equal(registered.status,201);
   assert.equal(registered.member.isAdmin,true);
+  assert.equal(registered.member.emailOptIn,true);
   const member=await service.current(registered.setCookie);
   assert.equal(member.email_verified,true);
   assert.equal((await service.publish({title:'New meeting',body:'Come along',emailEveryone:true},member)).status,201);

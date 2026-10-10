@@ -17,7 +17,6 @@
   <script src="/email-verification.js" defer></script>
   <link rel="stylesheet" href="/announcements.css">
   <script src="/announcements.js" defer></script>
-  <script src="/club-admin.js" defer></script>
 </head>
 <body class="auth-page">
   <main class="auth-layout">
@@ -79,20 +78,7 @@
           <button id="auth-submit" class="auth-submit" type="submit">VYTVOŘIT ÚČET <span aria-hidden="true">→</span></button>
           <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p>
         </form>
-        <section id="account-summary" class="auth-account-summary" hidden><h2>Vítej v klubu!</h2><p id="account-name"></p><div class="auth-mail-preferences"><p id="account-mail-status">Klubové e-maily jsou volitelné.</p><button id="account-email-opt-in" type="button" class="auth-mail-button">POVOLIT KLUBOVÉ E-MAILY</button></div><button id="account-logout" class="auth-submit" type="button">ODHLÁSIT SE</button></section>
-        <section id="club-admin" class="club-admin" hidden aria-labelledby="club-admin-heading">
-          <div class="club-admin-top"><span class="club-admin-eyebrow">STEEL BROTHERS / CLUB MANAGEMENT</span><h2 id="club-admin-heading">SPRÁVA OZNÁMENÍ.</h2><p>Vytvářej aktuality pro klub. Všichni je uvidí pod zvonečkem, e-mail dostanou jen přihlášení odběratelé.</p></div>
-          <form id="club-admin-compose" class="club-admin-form">
-            <label for="club-admin-title">Nadpis oznámení</label>
-            <input id="club-admin-title" name="title" required minlength="4" maxlength="120" placeholder="Např. Sobotní vyjížďka">
-            <label for="club-admin-message">Zpráva pro členy</label>
-            <textarea id="club-admin-message" name="body" required minlength="5" maxlength="3000" rows="5" placeholder="Kde a kdy se sejdeme?"></textarea>
-            <label class="club-admin-send"><input id="club-admin-email" type="checkbox"> Odeslat e-mail členům, kteří si zapnuli klubové notifikace</label>
-            <button id="club-admin-submit" class="auth-submit" type="submit">ZVEŘEJNIT AKTUALITU →</button>
-            <p id="club-admin-status" role="status" aria-live="polite"></p>
-          </form>
-        </section>
-        <p class="auth-footer-note">Účet se vytvoří až po ověření e-mailu. Tvé heslo je bezpečně zpracováno na serveru.</p>
+        <p class="auth-footer-note">Vytvořením účtu budeš dostávat klubové e-maily. Později je můžeš vypnout v Nastavení profilu. Hesla zůstávají zabezpečená na serveru.</p>
       </div>
     </section>
     <aside class="auth-showcase" aria-label="Steel Brothers — Jedna cesta, jedna parta">
