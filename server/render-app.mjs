@@ -57,12 +57,12 @@ function makeRateLimiter(now = Date.now) {
   };
 }
 
-async function toWebRequest(req, url) {
+async function toWebRequest(req, url, maxBytes = 8192) {
   const chunks = [];
   let length = 0;
   for await (const chunk of req) {
     length += chunk.length;
-    if (length > 8192) {
+    if (length > maxBytes) {
       const error = new Error('Request too large');
       error.status = 413;
       throw error;
@@ -250,7 +250,7 @@ export function createSteelBrothersServer({
         if(rateLimit('admin-unlock:'+ip,5,15*60_000)){
           await sendHttpResponse(res,apiResponse(429,{error:'Příliš mnoho pokusů. Zkus to za 15 minut.'}));return;
         }
-        const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname);
+        const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname,url.pathname==='/api/account/avatar'?105000:8192);
         const {data,error}=await readEmailPayload(request,['password'],allowedOrigins);
         if(error){await sendHttpResponse(res,error);return;}
         if(!adminAccess.verifyPassword(data.password)){
@@ -274,7 +274,7 @@ export function createSteelBrothersServer({
     if(url.pathname==='/api/account/me' && req.method==='GET') {
       const member=clubService?await clubService.current(req.headers.cookie):null;
       await sendHttpResponse(res,apiResponse(200,{member:member?{
-        email:member.email,nickname:member.nickname,emailOptIn:member.email_opt_in,
+        email:member.email,nickname:member.nickname,emailOptIn:member.email_opt_in,avatarData:member.avatar_data||null,
         isAdmin:isVerifiedClubAdmin(member)
       }:null}));return;
     }
@@ -286,7 +286,7 @@ export function createSteelBrothersServer({
       } catch { await sendHttpResponse(res,apiResponse(503,{error:'Oznámení nejsou dostupná.'})); }
       return;
     }
-    if(['/api/account/register','/api/account/login','/api/account/logout','/api/account/preferences','/api/announcements'].includes(url.pathname)) {
+    if(['/api/account/register','/api/account/login','/api/account/logout','/api/account/preferences','/api/account/avatar','/api/announcements'].includes(url.pathname)) {
       if(req.method!=='POST'){await sendHttpResponse(res,apiResponse(405,{error:'Method not allowed'}));return;}
       if(!clubService){await sendHttpResponse(res,apiResponse(503,{error:'Účty čekají na připojení databáze Neon.'}));return;}
       const address=(req.headers['x-forwarded-for']||req.socket.remoteAddress||'unknown').toString().split(',')[0].trim().slice(0,70);
@@ -299,9 +299,10 @@ export function createSteelBrothersServer({
         const fields=url.pathname.endsWith('/register')?['email','nickname','password','verificationProof']
           :url.pathname.endsWith('/login')?['email','password']
           :url.pathname.endsWith('/preferences')?['emailOptIn']
+          :url.pathname.endsWith('/avatar')?['avatarData']
           :url.pathname==='/api/announcements'?['title','body','emailEveryone']:[];
         const {data,error}=await readEmailPayload(request,fields,allowedOrigins,
-          url.pathname==='/api/announcements'?8192:2048);
+          url.pathname==='/api/announcements'?8192:url.pathname==='/api/account/avatar'?105000:2048);
         if(error){await sendHttpResponse(res,error);return;}
         const member=await clubService.current(req.headers.cookie);
         let action;
@@ -316,7 +317,8 @@ export function createSteelBrothersServer({
             if(!data.emailOptIn)await db.query("UPDATE sb_announcement_emails SET status='cancelled' WHERE member_id=$1 AND status='queued'",[member.id]);
             action={status:200,message:'Nastavení uloženo.'};
           }
-        } else action=adminAccess.unlocked(member,req.headers.cookie)
+        } else if(url.pathname.endsWith('/avatar'))action=await clubService.updateAvatar(member,data.avatarData);
+        else action=adminAccess.unlocked(member,req.headers.cookie)
           ? await clubService.publish(data,member)
           : {status:403,error:'Pro zveřejnění otevři profil a odemkni administraci heslem.'};
         const {setCookie,status,...body}=action;
