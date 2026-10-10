@@ -22,7 +22,7 @@
     return null;
   }
   let savedContent=null;
-  const english=()=>window.SteelI18n?.lang==='en';
+  const english=()=>globalThis.window?.SteelI18n?.lang==='en';
   const localized=(item,key,max=1000)=>{
     if(!item||typeof item!=='object')return null;
     return (english() && safeText(item[key+'En'],max))||safeText(item[key],max);
