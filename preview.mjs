@@ -33,7 +33,8 @@ const routes = new Map([
   ['/gallery.js', 'gallery.js'],
   ['/styles.css', 'styles.css'],
   ['/steel-brothers-logo.avif', 'steel-brothers-logo.avif'],
-  ['/favicon.png', 'favicon.png']
+  ['/favicon.png', 'favicon.png'],
+  ['/robots.txt', 'robots.txt']
 ]);
 const mime = {
   '.html': 'text/html; charset=utf-8',
@@ -45,7 +46,7 @@ const mime = {
 };
 
 http.createServer(async (req, res) => {
-  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noimageindex');
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noimageindex, nosnippet');
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405); res.end('Method not allowed'); return;
   }
