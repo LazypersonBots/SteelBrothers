@@ -6,6 +6,7 @@ import { makeEmailVerification, readyForVerification, readEmailPayload, apiRespo
 import { renderVerificationEmail } from './email-template.mjs';
 import { createVerificationMemoryStore } from './render-memory-store.mjs';
 import { createClubService } from './club-service.mjs';
+import { ADMIN_EMAILS } from './club-db.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const routes = new Map([
@@ -223,7 +224,7 @@ export function createSteelBrothersServer({
       const member=clubService?await clubService.current(req.headers.cookie):null;
       await sendHttpResponse(res,apiResponse(200,{member:member?{
         email:member.email,nickname:member.nickname,emailOptIn:member.email_opt_in,
-        isAdmin:member.email==='gamedriverstudio@gmail.com'||member.email==='steel.brothersmed@gmail.com'
+        isAdmin:ADMIN_EMAILS.has(member.email) && member.email_verified===true && !!member.verified_at
       }:null}));return;
     }
     if(url.pathname==='/api/announcements' && req.method==='GET') {
@@ -244,7 +245,7 @@ export function createSteelBrothersServer({
       }
       try{
         const request=await toWebRequest(req,'https://steelbrothers.cz'+url.pathname);
-        const fields=url.pathname.endsWith('/register')?['email','nickname','password','verificationProof','emailOptIn']
+        const fields=url.pathname.endsWith('/register')?['email','nickname','password','verificationProof']
           :url.pathname.endsWith('/login')?['email','password']
           :url.pathname.endsWith('/preferences')?['emailOptIn']
           :url.pathname==='/api/announcements'?['title','body','emailEveryone']:[];
