@@ -210,9 +210,12 @@ start with that setting on, and can opt out immediately after registering.
 
 This update extends the original Steel Brothers pages **without recreating the
 site, account system, database, email service or admin console**. The homepage
-keeps its original hero, About, Activities, Gallery and Join sections. A compact
-history disclosure lives inside About; the existing Activities section now
-shows the nearest confirmed public event and latest official announcement.
+keeps its original hero, About, Activities, Gallery and Join sections.
+History has its own `/history/` page, linked from About. The existing Activities
+section shows the nearest confirmed public event. **News is its own full-width
+homepage section between Activities and Gallery**, with a heading matching the
+Activities design and up to three latest real club announcements. Its "All
+announcements" button opens the existing bell (no competing news database).
 Support/Merch and Contact appear below Gallery. **Media is the same page as
 Gallery** and includes an approved-videos area, not a second gallery.
 
@@ -241,7 +244,9 @@ future entries meeting these requirements, nearest first, with Prague local
 time. When there are none, visitors see an explicit empty state; no dummy
 events are shown. Private or draft events are never displayed.
 
-News reuses the **existing Neon-backed** `/api/announcements` and bell. Members,
+News reuses the **existing Neon-backed** `/api/announcements` and bell; the
+homepage preview shows up to three published announcements and displays an honest
+empty state if there are none. Members,
 password-protected administration, Resend and the database schema are unchanged.
 The site-wide `noindex` policy also remains in force; improving usability
 and page semantics does not authorize Google indexing.
