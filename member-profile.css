@@ -38,3 +38,5 @@
 .sb-profile-logout{display:block;width:100%;border:1px solid #665047;border-radius:6px;background:#28201d;color:#f4d0bc;padding:11px;cursor:pointer;font:800 11px Arial,sans-serif;margin-top:8px}
 .sb-bell{top:auto!important;bottom:18px!important;right:18px!important}
 @media(max-width:750px){.sb-member-slot{margin-left:0}.header{flex-wrap:wrap;gap:12px}.sb-member-trigger{padding:4px 9px 4px 4px}.sb-profile-popover{position:fixed;right:9px;top:84px;max-height:calc(100dvh - 92px)}.sb-bell{bottom:14px!important;right:12px!important}}
+
+.header a.header-action[hidden]{display:none!important}
