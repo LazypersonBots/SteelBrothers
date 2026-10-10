@@ -4,6 +4,7 @@ export const verificationLimit=email=>ADMIN_EMAILS.has(email)?30:1;
 const schema=[
 "CREATE TABLE IF NOT EXISTS sb_members (id BIGSERIAL PRIMARY KEY,email TEXT NOT NULL UNIQUE,nickname VARCHAR(32) NOT NULL,password_hash TEXT NOT NULL,email_opt_in BOOLEAN NOT NULL DEFAULT TRUE,verified_at TIMESTAMPTZ NOT NULL DEFAULT now(),created_at TIMESTAMPTZ NOT NULL DEFAULT now())",
 "CREATE TABLE IF NOT EXISTS sb_email_verifications (email TEXT PRIMARY KEY,code_hash TEXT,nonce TEXT,sent_at TIMESTAMPTZ,expires_at TIMESTAMPTZ,attempts INTEGER NOT NULL DEFAULT 0,verification_count INTEGER NOT NULL DEFAULT 0,state TEXT NOT NULL DEFAULT 'unused',proof_hash TEXT,proof_expires_at TIMESTAMPTZ,CONSTRAINT sb_verification_count CHECK (verification_count BETWEEN 0 AND 30))",
+"ALTER TABLE sb_members ADD COLUMN IF NOT EXISTS avatar_data TEXT",
 "CREATE TABLE IF NOT EXISTS sb_sessions (token_hash TEXT PRIMARY KEY,member_id BIGINT NOT NULL REFERENCES sb_members(id) ON DELETE CASCADE,expires_at TIMESTAMPTZ NOT NULL)",
 "CREATE INDEX IF NOT EXISTS sb_sessions_member ON sb_sessions(member_id)",
 "CREATE TABLE IF NOT EXISTS sb_announcements (id BIGSERIAL PRIMARY KEY,title VARCHAR(120) NOT NULL,body TEXT NOT NULL,author_id BIGINT NOT NULL REFERENCES sb_members(id),created_at TIMESTAMPTZ NOT NULL DEFAULT now())",
