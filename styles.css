@@ -118,3 +118,56 @@
 @media(max-width:800px){.club-public-info{gap:14px}.club-public-panel{padding:26px 22px}.club-news-preview{padding:19px}}
 @media(max-width:650px){.club-public-info{grid-template-columns:1fr}.club-news-heading{align-items:flex-start;flex-direction:column}.club-news-open{width:100%;min-height:42px;text-align:left}.club-news-preview{padding:17px;margin-bottom:24px}.club-public-panel{padding:25px 20px}.club-history summary{min-height:48px}.club-video-section{margin-top:45px;padding-top:35px}.footer-links{gap:12px}}
 @media(prefers-reduced-motion:reduce){.club-history[open] summary span:last-child{transform:none}}
+
+/* Incremental layout additions: bilingual navigation, standalone history and clubhouse. */
+.header nav{flex-wrap:wrap;row-gap:10px;justify-content:center}
+.header nav a{white-space:nowrap}
+.lang-switch{display:inline-flex;align-items:center;flex:none;gap:3px;vertical-align:middle;padding:3px;border:1px solid #71523d;background:#221d19;border-radius:7px;color:#f4dbc6}
+.lang-switch button{border:0;background:transparent;color:#d9c7b9;font:700 10px Arial,sans-serif;letter-spacing:.45px;padding:9px 8px;cursor:pointer;border-radius:5px}
+.lang-switch button[aria-pressed="true"]{background:#f46b35;color:#1b1713}
+.lang-switch button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.auth-topbar .lang-switch{margin-left:auto}
+.club-history-link{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:29px;padding:17px 15px;border:1px solid #765039;color:#fcb88d;font-size:11px;font-weight:800;letter-spacing:.8px;line-height:1.5}
+.club-history-link:hover,.club-history-link:focus-visible{background:#3b281e;border-color:#f46b35}
+.club-house{background:#171716;border-top:1px solid #39332d}
+.clubhouse-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(270px,.8fr);gap:24px;align-items:stretch}
+.clubhouse-photos{display:grid;grid-template-columns:1.3fr 1fr;gap:12px}
+.clubhouse-photos figure{min-width:0;margin:0}
+.clubhouse-photos a{display:block;border:1px solid #58473a;background:#28211d;overflow:hidden;aspect-ratio:4/3}
+.clubhouse-photos a:focus-visible{outline:2px solid var(--orange);outline-offset:4px}
+.clubhouse-photos img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s ease}
+.clubhouse-photos a:hover img{transform:scale(1.035)}
+.clubhouse-photos figcaption{color:#d2c6ba;letter-spacing:.8px;font-size:10px;padding-top:13px}
+.clubhouse-details{background:linear-gradient(145deg,#29231e,#211e1a);border:1px solid #6a4b3b;border-top:3px solid var(--orange);padding:25px 23px}
+.clubhouse-details h3{font-size:20px;line-height:1.4;color:#f4ede5;margin:0 0 18px}
+.clubhouse-details [data-club-hours]{line-height:1.8;font-size:14px;color:#ddd0c2}
+.clubhouse-details .club-public-note{margin-top:16px;border-top:1px solid #5b4a3d;padding-top:14px}
+.club-hours-list{list-style:none;padding:0;margin:0;display:grid;gap:7px}
+.club-hours-list li{display:flex;gap:16px;justify-content:space-between;border-bottom:1px solid #4f4238;padding:6px 0}
+.club-hours-list li strong{font-size:13px;color:#f5dcc4}
+.club-hours-list li span{font-size:13px;text-align:right}
+.club-public-info{grid-template-columns:repeat(2,minmax(0,1fr))}
+.club-public-panel h2 .merch-emphasis{color:#ff9561}
+.club-social-links{margin-top:25px;font-size:13px;line-height:1.8;color:#c2afa3;display:flex;gap:12px;flex-wrap:wrap}
+.club-social-links a{display:inline-flex;border:1px solid #6c513e;color:#ffd2b4;padding:10px 14px;font-size:13px;font-weight:700;text-decoration:none}
+.club-social-links a:hover,.club-social-links a:focus-visible{border-color:#f46b35;background:#382a20}
+.club-memorial-panel{border-color:#6b4b3a}
+.club-memorial-panel .memorial-rip{color:#f46b35;letter-spacing:4px}
+.club-memorial-panel .club-memorial-list{display:flex;flex-direction:column;gap:14px;text-align:left}
+.club-memorial-panel .club-memory-entry{background:#1d1b19;padding:15px}
+.history-page-section{min-height:75vh;max-width:1600px;margin:0 auto}
+.history-lead{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:30px;border-bottom:1px solid #544135;padding-bottom:45px}
+.history-page h1{font-size:clamp(48px,6vw,88px)}
+.history-page .history-accent{color:var(--orange)}
+.history-subtitle{margin:26px 0;color:#c7bdb3;font-size:17px;line-height:1.7;max-width:640px}
+.history-crest{width:clamp(130px,19vw,260px);height:auto;object-fit:contain;filter:drop-shadow(0 12px 20px #0008)}
+.history-sections{display:grid;gap:22px;grid-template-columns:repeat(2,minmax(0,1fr));padding-top:35px}
+.history-card{background:#211e1b;border:1px solid #604333;border-top:3px solid #f46b35;padding:31px}
+.history-card h2{font-size:clamp(27px,3vw,43px);margin-bottom:19px}
+.history-card>p:last-child{color:#cec1b5;font-size:15px;line-height:1.9;white-space:pre-wrap}
+.history-card.club-chapters{grid-column:1/-1}
+.history-page [aria-current="page"]{color:var(--orange)}
+@media(max-width:1100px){.clubhouse-layout{grid-template-columns:1fr}.header{gap:13px}.header nav{gap:14px;font-size:12px}.header-action{font-size:10px}}
+@media(max-width:720px){.lang-switch{margin-left:auto}.header nav{justify-content:flex-start;gap:12px 17px}.clubhouse-photos{gap:8px}.history-lead{grid-template-columns:1fr}.history-crest{display:none}.history-sections{grid-template-columns:1fr}.history-card{padding:24px}.history-card.club-chapters{grid-column:auto}}
+@media(max-width:460px){.header nav{font-size:11px;gap:10px 14px}.clubhouse-photos{grid-template-columns:1fr}.clubhouse-photos a{aspect-ratio:16/10}.clubhouse-details{padding:19px}.lang-switch button{padding:9px 6px}}
+@media(prefers-reduced-motion:reduce){.clubhouse-photos img{transition:none}.clubhouse-photos a:hover img{transform:none}}
