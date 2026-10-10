@@ -205,3 +205,53 @@ access; passwords have five attempts per IP per 15 minutes.
 Creating an announcement publishes it in the bell and queues Resend notification
 emails for members whose club email setting is **on**. Newly registered members
 start with that setting on, and can opt out immediately after registering.
+
+## Club content and confirmed events (October 2026)
+
+This update extends the original Steel Brothers pages **without recreating the
+site, account system, database, email service or admin console**. The homepage
+keeps its original hero, About, Activities, Gallery and Join sections. A compact
+history disclosure lives inside About; the existing Activities section now
+shows the nearest confirmed public event and latest official announcement.
+Support/Merch and Contact appear below Gallery. **Media is the same page as
+Gallery** and includes an approved-videos area, not a second gallery.
+
+### Approving club information
+
+Edit `club-content.json` after the club confirms the relevant details:
+
+- `history`: official historical text, or `null` while unverified.
+- `chapters`: publicly confirmed chapter names, initially `[]`.
+- `videos`: entries with `approved: true`, `title` and `url`; only HTTPS
+  YouTube or Vimeo links are displayed, never automatic embeds.
+- `merch`: entries with `approved: true`, `title` and `description`.
+  These are **information-only**, not product listings with checkout.
+- `contact`: approved public email, phone, address and optional public
+  clubhouse text. Unknown fields remain `null`. No contact form is enabled
+  without an approved recipient and anti-abuse requirements.
+- `memorials`: approved entries with `name`, `tribute` and
+  `approved: true`. The entire In Memory section is **hidden** until
+  at least one approved entry exists.
+
+Add a confirmed public event to `activity-data.json` under `activities` with
+`title`, `category`, `description`, `startsAt` (ISO 8601 with UTC offset),
+`confirmed: true` and `visibility: "public"`. Optional `location` can be
+included only when the venue is publicly approved. The calendar displays only
+future entries meeting these requirements, nearest first, with Prague local
+time. When there are none, visitors see an explicit empty state; no dummy
+events are shown. Private or draft events are never displayed.
+
+News reuses the **existing Neon-backed** `/api/announcements` and bell. Members,
+password-protected administration, Resend and the database schema are unchanged.
+The site-wide `noindex` policy also remains in force; improving usability
+and page semantics does not authorize Google indexing.
+
+### Verification
+
+`npm run build` runs the complete Node test suite and creates `dist/`.
+GitHub Actions checks the static output includes the new JSON and script.
+The tests cover original navigation and UI components, email/account behavior
+with mock stores, date filtering, approved-only editorial rendering, gallery,
+announcement permission checks, build routes and noindex. A real device/browser
+walkthrough and checks of production Render, Neon and Resend credentials
+remain necessary before claiming live integrations are verified.
