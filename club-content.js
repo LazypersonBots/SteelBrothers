@@ -175,13 +175,30 @@
         return;
       }
       const items=Array.isArray(data.announcements)?data.announcements:[];
-      const current=items.find(item=>safeText(item.title,120)&&safeText(item.body,3000));
-      if(!current){news.textContent='Zatím nebylo zveřejněno žádné klubové oznámení.';return;}
-      const card=element('article','club-news-item');
-      card.append(element('h3','',current.title.trim()));
-      const excerpt=current.body.trim();
-      card.append(element('p','',excerpt.length>180?excerpt.slice(0,177)+'…':excerpt));
-      news.replaceChildren(card);
+      const recent=items.filter(item=>safeText(item.title,120)&&safeText(item.body,3000)).slice(0,3);
+      if(!recent.length){
+        news.textContent='Zatím nebylo zveřejněno žádné klubové oznámení.';
+        return;
+      }
+      const cards=recent.map(item=>{
+        const card=element('article','club-news-item');
+        card.append(element('h3','',item.title.trim()));
+        const excerpt=item.body.trim();
+        card.append(element('p','',excerpt.length>260?excerpt.slice(0,257)+'…':excerpt));
+        if(item.created_at){
+          const date=new Date(item.created_at);
+          if(!Number.isNaN(date.getTime())){
+            const time=element('time','club-news-date',
+              date.toLocaleDateString(english()?'en-GB':'cs-CZ',{
+                day:'numeric',month:'long',year:'numeric'
+              }));
+            time.dateTime=date.toISOString();
+            card.append(time);
+          }
+        }
+        return card;
+      });
+      news.replaceChildren(...cards);
     }catch{
       news.textContent='Aktuality jsou dočasně nedostupné. Zkus to později.';
     }
