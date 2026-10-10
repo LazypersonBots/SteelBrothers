@@ -171,3 +171,19 @@
 @media(max-width:720px){.lang-switch{margin-left:auto}.header nav{justify-content:flex-start;gap:12px 17px}.clubhouse-photos{gap:8px}.history-lead{grid-template-columns:1fr}.history-crest{display:none}.history-sections{grid-template-columns:1fr}.history-card{padding:24px}.history-card.club-chapters{grid-column:auto}}
 @media(max-width:460px){.header nav{font-size:11px;gap:10px 14px}.clubhouse-photos{grid-template-columns:1fr}.clubhouse-photos a{aspect-ratio:16/10}.clubhouse-details{padding:19px}.lang-switch button{padding:9px 6px}}
 @media(prefers-reduced-motion:reduce){.clubhouse-photos img{transition:none}.clubhouse-photos a:hover img{transform:none}}
+
+/* News is an independent homepage section, using the same hierarchy as Activities. */
+.club-news-section{background:#171716;border-top:1px solid #39332d;border-bottom:1px solid #39332d}
+.club-news-section .section-top{margin-bottom:22px}
+.club-news-section .section-top .accent{margin-bottom:20px}
+.club-news-intro{max-width:680px;color:var(--muted);font-size:15px;line-height:1.75;margin-bottom:29px}
+.club-news-section .club-news-feed{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin:0;color:#bfb7ae;font-size:14px}
+.club-news-section .club-news-item{display:flex;flex-direction:column;gap:14px;min-width:0;min-height:210px;background:#23221f;border:1px solid #454039;border-top:3px solid var(--orange);padding:26px;overflow-wrap:anywhere}
+.club-news-section .club-news-item h3{font-family:Arial,Helvetica,sans-serif;font-weight:700;font-size:21px;line-height:1.3;color:var(--text)}
+.club-news-section .club-news-item p{margin:0;color:#bcb3a8;line-height:1.7;white-space:pre-wrap;font-size:14px}
+.club-news-date{margin-top:auto;border-top:1px solid #51463b;padding-top:12px;color:#f0a474;font-size:12px}
+.club-news-section .club-news-open{font:700 12px Arial,Helvetica,sans-serif;cursor:pointer;border:0;border-radius:0;display:inline-flex;align-items:center;justify-content:center;gap:14px;padding:15px 21px}
+.club-news-section .club-news-open:hover{background:#ff8759;color:#171716}
+.club-news-section .club-news-open:focus-visible{outline:3px solid var(--orange);outline-offset:5px}
+@media(max-width:1120px){.club-news-section .club-news-feed{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){.club-news-section .club-news-feed{grid-template-columns:1fr}.club-news-section .club-news-item{padding:23px;min-height:0}.club-news-section .club-news-intro{font-size:14px}}
