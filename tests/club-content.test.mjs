@@ -12,12 +12,18 @@ test('existing homepage and gallery contain new content without replacing the la
     'class="section gallery"','class="join section"','id="sb-bell"']){
     assert.ok(home.includes(original),original);
   }
-  assert.match(home,/data-club-history/);
+  const history=await read('history/index.html');
+  assert.match(history,/data-club-history/);
+  assert.match(home,/href="\/history\/"/);
+  assert.doesNotMatch(home,/data-club-history/);
   assert.match(home,/data-club-news/);
   assert.match(home,/data-next-event/);
   assert.match(home,/data-merch-list/);
   assert.match(home,/data-public-contact/);
-  assert.match(home,/data-memorials[^>]*hidden/);
+  assert.match(home,/data-memorials/);
+  assert.match(home,/R\.I\.P\./);
+  assert.match(home,/data-club-hours/);
+  assert.match(home,/data-club-socials/);
   assert.match(gallery,/data-gallery-grid="all"/);
   assert.match(gallery,/data-approved-videos/);
   assert.match(gallery,/GALERIE &amp; MEDIA/);
@@ -30,6 +36,9 @@ test('unapproved editorial content defaults to empty and there are no invented e
   const editorial=JSON.parse(await read('club-content.json'));
   const events=JSON.parse(await read('activity-data.json'));
   assert.equal(editorial.history,null);
+  assert.equal(editorial.historyEn,null);
+  assert.equal(editorial.clubhouse.openingHours,null);
+  assert.deepEqual(editorial.socials,[]);
   assert.deepEqual(editorial.chapters,[]);
   assert.deepEqual(editorial.videos,[]);
   assert.deepEqual(editorial.merch,[]);
@@ -45,17 +54,19 @@ test('approved content is safely rendered; unapproved people and unsafe videos a
     return {tag,children:[],hidden:true,textContent:'',className:'',
       append(...items){this.children.push(...items);},
       replaceChildren(...items){this.children=items;},
+      querySelector(){return null;},remove(){},
       addEventListener(){},getAttribute(){return null;}};
   }
   const history=node(),chapters=node(),contact=node(),memorials=node(),memorialList=node();
-  const videos=node(),merch=node(),pending=node(),news=node(),open=node();
+  const videos=node(),merch=node(),pending=node(),news=node(),open=node(),hours=node(),socials=node();
   const registry={
     '[data-club-history]':history,'[data-club-chapters]':chapters,
     '[data-public-contact]':contact,'[data-memorials]':memorials,
     '[data-memorial-list]':memorialList,
     '[data-approved-videos]':videos,'[data-merch-list]':merch,
     '[data-merch-pending]':pending,'[data-club-news]':news,
-    '[data-open-announcements]':open
+    '[data-open-announcements]':open,
+    '[data-club-hours]':hours,'[data-club-socials]':socials
   };
   const document={
     querySelector:selector=>registry[selector]||null,
@@ -64,6 +75,10 @@ test('approved content is safely rendered; unapproved people and unsafe videos a
   };
   const content={
     history:'Schválená historie',
+    historyEn:'Approved history',
+    clubhouse:{approved:true,openingHours:[{day:'Pondělí',dayEn:'Monday',hours:'10:00–16:00'}]},
+    socials:[{approved:true,platform:'Instagram',url:'https://instagram.com/steelbrothers'},
+      {approved:true,platform:'Unsafe',url:'https://instagram.com.evil.example'}],
     chapters:['Oficiální chapter'],
     videos:[
       {approved:true,title:'Oficiální video',url:'https://www.youtube.com/watch?v=example'},
@@ -96,13 +111,16 @@ test('approved content is safely rendered; unapproved people and unsafe videos a
   assert.equal(videos.children.length,1);
   assert.equal(videos.children[0].children[1].href,'https://www.youtube.com/watch?v=example');
   assert.equal(news.children[0].children[0].textContent,'Oznámení');
+  assert.equal(hours.children[0].children.length,1);
+  assert.equal(socials.children.length,1);
+  assert.equal(socials.children[0].rel,'noopener noreferrer');
 });
 
 test('new assets use current Render/preview routing and existing build, not new services',async()=>{
   const build=await read('scripts/build-gallery.mjs');
   const render=await read('server/render-app.mjs');
   const preview=await read('preview.mjs');
-  for(const file of ['club-content.json','club-content.js']){
+  for(const file of ['club-content.json','club-content.js','language.js']){
     for(const source of [build,render,preview])assert.ok(source.includes(file),file);
   }
   assert.match(render,/X-Robots-Tag/);
