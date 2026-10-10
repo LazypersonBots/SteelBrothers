@@ -70,23 +70,43 @@ test('both activity and gallery have working return and navigation links', async
   assert.match(gallery,/href="\/activity\/">Aktivity/);
 });
 
-test('signin keeps account creation demo and adds real standalone email verification', async () => {
-  const page = await read('signin/index.html');
-  const js = await read('signin.js');
+test('signin creates actual accounts only after server email proof', async () => {
+  const page=await read('signin/index.html');
+  const js=await read('signin.js');
+  const otp=await read('email-verification.js');
   assert.match(page,/id="email"[^>]+type="email" required/);
   assert.match(page,/id="nickname"[^>]+required/);
-  assert.match(page,/id="password"[^>]+type="password" required minlength="8"/);
+  assert.match(page,/id="password"[^>]+type="password" required minlength="10"/);
   assert.match(page,/id="confirm-password"[^>]+required/);
-  assert.match(page, /id="send-email-code"/);
-  assert.match(page, /id="email-code"/);
-  assert.match(page, /id="verify-email-code"/);
-  assert.match(page, /src="\/email-verification\.js"/);
-  assert.match(page, /DEMO ÚČTY/);
-  assert.match(page, /Vytvoření účtu zatím připravujeme/);
-  assert.match(js,/event\.preventDefault\(\)/);
-  assert.match(js,/reportValidity\(\)/);
-  assert.doesNotMatch(js,/\bfetch\s*\(|\blocalStorage\b\s*\./);
-  assert.doesNotMatch(page,/<form[^>]+action=/);
+  assert.match(page,/id="send-email-code"/);
+  assert.match(page,/id="email-opt-in"/);
+  assert.match(page,/id="account-summary"/);
+  assert.doesNotMatch(page,/DEMO ÚČTY|účet nebude vytvořen/);
+  assert.match(js,/\/api\/account\//);
+  assert.match(js,/mode==='register'\?'register':'login'/);
+  assert.match(js,/verificationProof/);
+  assert.match(js,/\/api\/account\//);
+  assert.match(js,/\/api\/account\/logout/);
+  assert.match(js,/\/api\/account\/preferences/);
+  assert.match(otp,/result\.verificationProof/);
+  assert.doesNotMatch(js,/localStorage/);
+});
+
+test('announcement bell, accessible modal and admin-only composer appear on every page',async()=>{
+  for(const path of ['index.html','signin/index.html','gallery/index.html','activity/index.html']){
+    const page=await read(path);
+    assert.match(page,/src="\/announcements\.js"/);
+    assert.match(page,/href="\/announcements\.css"/);
+    assert.match(page,/id="sb-bell"/);
+    assert.match(page,/id="sb-notices"/);
+    assert.match(page,/role="dialog"/);
+    assert.match(page,/id="sb-notice-compose"/);
+  }
+  const js=await read('announcements.js');
+  assert.match(js,/\/api\/announcements/);
+  assert.match(js,/me\.member\.isAdmin/);
+  assert.match(js,/textContent/);
+  assert.doesNotMatch(js,/innerHTML/);
 });
 
 test('all four pages use the official PNG favicon, never SB letter artwork', async () => {
@@ -117,7 +137,8 @@ test('sign-in design has the official crest, clear hierarchy, and restrained CSS
   assert.match(css, /\.auth-story-motion i\{opacity:0!important\}/);
   assert.doesNotMatch(html, /ride-motion\.js|auth-drive-road|auth-drive-dial|auth-simple-panel|auth-ride-bike/);
   assert.doesNotMatch(css, /auth-drive-road|auth-drive-dial|auth-simple-slide|auth-ride-bike/);
-  assert.doesNotMatch(js, /fetch\s*\(|supabase/i);
+  assert.match(js, /\/api\/account\/status/);
+  assert.doesNotMatch(js, /supabase/i);
 });
 
 test('sign-in and other pages retain the official Steel Brothers favicon', async () => {
@@ -138,7 +159,7 @@ test('Netlify and local preview serve both secondary pages', async () => {
     assert.ok(preview.includes("['/" + slug + "', '" + slug + "/index.html']"));
     assert.ok(build.includes("join(output, '" + slug + "')"));
   }
-  for (const name of ['activity.js','activity-data.json','signin.js','email-verification.js','auth.css','favicon.png']) {
+  for (const name of ['activity.js','activity-data.json','signin.js','email-verification.js','auth.css','announcements.js','announcements.css','favicon.png']) {
     assert.ok(build.includes("'" + name + "'"));
   }
 });

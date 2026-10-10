@@ -23,6 +23,8 @@ const routes = new Map([
   ['/activity.js', 'activity.js'],
   ['/signin.js', 'signin.js'],
   ['/email-verification.js', 'email-verification.js'],
+  ['/announcements.js', 'announcements.js'],
+  ['/announcements.css', 'announcements.css'],
   ['/auth.css', 'auth.css'],
   ['/gallery-data.json', 'gallery-data.json'],
   ['/gallery.js', 'gallery.js'],

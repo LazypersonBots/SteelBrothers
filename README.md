@@ -117,3 +117,44 @@ member accounts; signup and login remain demos.
 Do not switch the steelbrothers.cz DNS until the Render URL, photos, page
 navigation and actual Resend delivery are verified. Existing Netlify deployment
 can stay online during migration.
+
+## Steel Brothers member accounts and club announcements (Neon)
+
+These features use the **dedicated SteelBrothers Club Neon project**, not Supabase.
+Neon project ID: `cold-sky-16736637`; existing default branch: `production`.
+The site and server still run on Render; Neon CLI deployment is not required
+for this plain Node + PostgreSQL website. A separate private DB connection
+string is needed so that the Render service can use the existing Neon project.
+
+### Activate on Render
+
+1. Open https://console.neon.tech and select SteelBrothers Club / production.
+2. Click **Connect** and copy a **pooled PostgreSQL connection string**.
+3. In the **SteelBrothers Render web service**, choose Environment > Add:
+   `STEELBROTHERS_DATABASE_URL` = that full Neon connection string.
+4. Keep the existing `RESEND_API_KEY` and
+   `STEELBROTHERS_VERIFICATION_SECRET` unchanged.
+5. Redeploy the Render service. The server creates dedicated `sb_*` tables
+   on first successful startup; it logs `Steel Brothers persistent member database: READY`.
+6. Check `/api/account/status` returns `{ "available": true }` and test
+   a real registration and club email using a mailbox you control.
+
+**Never paste the connection string into chat or commit it to GitHub.**
+Do not connect any personal Supabase project. When this variable is missing
+or invalid, registration and announcing are disabled rather than saved in RAM.
+
+### Rules
+
+- Every email may successfully verify once. The two allowlisted owner emails
+  `gamedriverstudio@gmail.com` and `steel.brothersmed@gmail.com` may
+  successfully verify up to 30 times each. This is a verification limit, not
+  permission to create 30 accounts (one account per address).
+- Registration requires server-side verification proof; passwords use scrypt
+  with individual salts. Sessions are HttpOnly, Secure, and SameSite=Lax.
+- Only signed-in, verified owner emails can post announcements and optionally
+  email club subscribers. The bell is a popup on all four pages.
+- Bulk emails go only to members who **explicitly opted in**; members can
+  unsubscribe via the account preferences checkbox.
+- The email delivery queue is saved in Neon and retried after restarts. Free
+  Render sleep can delay notifications; emails can still require monitoring.
+- Emails go through the existing SteelBrothers Resend domain.

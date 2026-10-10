@@ -5,16 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow, noimageindex">
   <meta name="googlebot" content="noindex, nofollow, noimageindex">
-  <meta name="description" content="Ukázka registrace a přihlášení pro Steel Brothers. Ověření e-mailu a účty teprve připravujeme.">
+  <meta name="description" content="Registrace a přihlášení členů Steel Brothers s ověřením e-mailu.">
   <meta name="theme-color" content="#101010">
   <link rel="canonical" href="https://steelbrothers.cz/signin/">
-  <meta property="og:title" content="Přihlášení (demo) | Steel Brothers">
-  <title>Přihlášení (demo) | Steel Brothers</title>
+  <meta property="og:title" content="Přihlášení | Steel Brothers">
+  <title>Přihlášení | Steel Brothers</title>
   <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/auth.css">
   <script src="/signin.js" defer></script>
   <script src="/email-verification.js" defer></script>
+  <link rel="stylesheet" href="/announcements.css">
+  <script src="/announcements.js" defer></script>
 </head>
 <body class="auth-page">
   <main class="auth-layout">
@@ -26,8 +28,8 @@
       <div class="auth-content">
         <p class="auth-kicker">STEEL BROTHERS / MEMBER ACCESS</p>
         <h1 id="auth-heading">Vytvořit účet<span>.</span></h1>
-        <p id="auth-subtitle" class="auth-subtitle">Připoj se ke Steel Brothers. Vytvoření účtu zatím připravujeme. Ověření e-mailu už může fungovat.</p>
-        <p class="auth-demo-notice"><span class="auth-live-dot" aria-hidden="true"></span> DEMO ÚČTY — hesla se nikam neposílají. Ověřovací e-mail může být skutečný.</p>
+        <p id="auth-subtitle" class="auth-subtitle">Připoj se ke Steel Brothers. Ověř svůj e-mail a vytvoř si klubový účet.</p>
+        <p class="auth-demo-notice"><span class="auth-live-dot" aria-hidden="true"></span> Připojování ke klubovým účtům…</p>
 
         <div class="auth-switch" role="group" aria-label="Vyberte režim">
           <button type="button" data-mode="register" aria-pressed="true">Registrace</button>
@@ -37,7 +39,7 @@
         <form id="auth-form" autocomplete="off">
           <div id="nickname-field" class="auth-field">
             <label for="nickname">Přezdívka</label>
-            <input id="nickname" name="nickname" type="text" required minlength="3" maxlength="32" autocomplete="off" placeholder="Tvoje přezdívka">
+            <input id="nickname" name="nickname" type="text" required minlength="3" maxlength="32" autocomplete="nickname" placeholder="Tvoje přezdívka">
           </div>
           <div class="auth-field">
             <label for="email">E-mail <span class="required-mark">*</span></label>
@@ -62,25 +64,26 @@
           <div class="auth-field">
             <label for="password">Heslo <span class="required-mark">*</span></label>
             <div class="auth-password">
-              <input id="password" name="password" type="password" required minlength="8" autocomplete="new-password" placeholder="Alespoň 8 znaků">
+              <input id="password" name="password" type="password" required minlength="10" autocomplete="new-password" placeholder="Alespoň 10 znaků">
               <button type="button" class="auth-reveal" data-toggle-password="password" aria-label="Zobrazit heslo" aria-pressed="false">Zobrazit</button>
             </div>
           </div>
           <div id="confirm-field" class="auth-field">
             <label for="confirm-password">Potvrdit heslo</label>
             <div class="auth-password">
-              <input id="confirm-password" name="confirmPassword" type="password" required minlength="8" autocomplete="new-password" placeholder="Zopakuj heslo">
+              <input id="confirm-password" name="confirmPassword" type="password" required minlength="10" autocomplete="new-password" placeholder="Zopakuj heslo">
               <button type="button" class="auth-reveal" data-toggle-password="confirm-password" aria-label="Zobrazit potvrzení hesla" aria-pressed="false">Zobrazit</button>
             </div>
           </div>
-          <label id="demo-acknowledge" class="auth-checkbox">
-            <input id="demo-agree" type="checkbox" required>
-            <span>Beru na vědomí, že jde o demo a účet nebude vytvořen.</span>
+          <label id="notification-opt-in" class="auth-checkbox">
+            <input id="email-opt-in" type="checkbox">
+            <span>Chci dostávat klubová oznámení e-mailem (volitelné; kdykoli lze vypnout).</span>
           </label>
-          <button id="auth-submit" class="auth-submit" type="submit">ZKONTROLOVAT REGISTRACI <span aria-hidden="true">→</span></button>
+          <button id="auth-submit" class="auth-submit" type="submit">VYTVOŘIT ÚČET <span aria-hidden="true">→</span></button>
           <p id="auth-feedback" class="auth-feedback" role="status" aria-live="polite"></p>
         </form>
-        <p class="auth-footer-note">Přihlášení a tvorba účtů jsou stále demo. Resend odesílá pouze ověřovací kódy po nakonfigurování.</p>
+        <section id="account-summary" class="auth-account-summary" hidden><h2>Vítej v klubu!</h2><p id="account-name"></p><label class="auth-checkbox"><input id="account-email-opt-in" type="checkbox"> Klubová oznámení e-mailem</label><button id="account-logout" class="auth-submit" type="button">ODHLÁSIT SE</button></section>
+        <p class="auth-footer-note">Účet se vytvoří až po ověření e-mailu. Tvé heslo je bezpečně zpracováno na serveru.</p>
       </div>
     </section>
     <aside class="auth-showcase" aria-label="Steel Brothers — Jedna cesta, jedna parta">
@@ -111,5 +114,19 @@
       </div>
     </aside>
   </main>
+  <button id="sb-bell" type="button" class="sb-bell" aria-label="Oznámení Steel Brothers" aria-haspopup="dialog" aria-expanded="false"><span aria-hidden="true">🔔</span><span class="sb-bell-count" hidden></span></button>
+  <div id="sb-notices" class="sb-notice-backdrop" hidden>
+    <section class="sb-notice-panel" role="dialog" aria-modal="true" aria-labelledby="sb-notice-title" tabindex="-1">
+      <header class="sb-notice-header"><div><small>STEEL BROTHERS</small><h2 id="sb-notice-title">Oznámení <span aria-hidden="true">🔔</span></h2></div><button id="sb-notice-close" class="sb-notice-close" type="button" aria-label="Zavřít oznámení">×</button></header>
+      <div id="sb-notice-items" class="sb-notice-items" aria-live="polite"><p>Načítání aktualit…</p></div>
+      <form id="sb-notice-compose" class="sb-notice-compose" hidden>
+        <h3>Nové klubové oznámení</h3><label for="sb-notice-subject">Nadpis</label><input id="sb-notice-subject" maxlength="120" required placeholder="Např. Nová vyjížďka">
+        <label for="sb-notice-message">Zpráva</label><textarea id="sb-notice-message" minlength="5" maxlength="3000" rows="4" required placeholder="Co je nového v klubu?"></textarea>
+        <label class="sb-notice-mail"><input id="sb-notice-send-email" type="checkbox"> Rozeslat e-mail členům, kteří mají povolená oznámení</label>
+        <button class="sb-notice-publish" type="submit">ZVEŘEJNIT OZNÁMENÍ</button><p id="sb-notice-feedback" role="status"></p>
+      </form>
+      <p id="sb-notice-login" class="sb-notice-footer" hidden><a href="/signin/">Přihlas se</a> pro klubové funkce.</p>
+    </section>
+  </div>
 </body>
 </html>

@@ -1,9 +1,11 @@
 import { createSteelBrothersServer } from './server/render-app.mjs';
 import { readyForVerification } from './server/verification.mjs';
+import { openClubDatabase } from './server/club-db.mjs';
 
 const port = Number(process.env.PORT || 10000);
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid PORT');
-const server = createSteelBrothersServer();
+const db = await openClubDatabase();
+const server = createSteelBrothersServer({db});
 server.listen(port, '0.0.0.0', () => {
   console.log('Steel Brothers running on 0.0.0.0:' + port);
   // Log configuration state, NEVER keys or email addresses. Real delivery is
@@ -22,3 +24,10 @@ server.listen(port, '0.0.0.0', () => {
         ? 'present' : 'missing or too short'));
   }
 });
+
+if(server.clubService){
+  // Pending notices stay in Neon and are retried after deploys/restarts.
+  await db.query("UPDATE sb_announcement_emails SET status='queued' WHERE status='sending'");
+  setImmediate(()=>server.clubService.sendPending(25).catch(()=>{}));
+  setInterval(()=>server.clubService.sendPending(25).catch(()=>{}),60000).unref();
+}
