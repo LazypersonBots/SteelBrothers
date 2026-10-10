@@ -1,0 +1,14 @@
+{
+  "_notes": "Only publish approved club information. Empty arrays and null fields never produce invented people, chapters, events or products.",
+  "history": null,
+  "chapters": [],
+  "videos": [],
+  "merch": [],
+  "contact": {
+    "email": null,
+    "phone": null,
+    "address": null,
+    "publicClubhouse": null
+  },
+  "memorials": []
+}
