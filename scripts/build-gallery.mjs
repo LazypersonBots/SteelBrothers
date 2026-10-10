@@ -78,6 +78,7 @@ export async function buildGallery() {
   const allPhotos = [...images];
   await rm(output, { recursive: true, force: true });
   await mkdir(join(output, 'gallery'), { recursive: true });
+  await mkdir(join(output, 'history'), { recursive: true });
   await mkdir(join(output, 'activity'), { recursive: true });
   await mkdir(join(output, 'signin'), { recursive: true });
   await mkdir(join(output, 'photos'), { recursive: true });
