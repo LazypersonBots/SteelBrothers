@@ -27,6 +27,7 @@ test('CZ/EN switch translates actual text and remembers language without changin
      const node={
        nodeType:1,tag,children:[],attrs:new Map(),dataset:{},listeners:{},className:'',
        matches(selector){return ['script','style','textarea'].includes(this.tag)&&selector.includes(this.tag);},
+       closest(){return null;}
        append(child){child.parentElement=this;this.children.push(child);},
        setAttribute(key,value){this.attrs.set(key,value);},
        getAttribute(key){return this.attrs.get(key)||null;},
