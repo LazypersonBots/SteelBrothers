@@ -31,13 +31,12 @@
        items.append(card);
      }
      const newest=announcements[0]?.id||0;
-     if(newest){
-       const lastRead=Number(localStorage.getItem('sb-last-announcement')||0);
-       const count=announcements.filter(a=>Number(a.id)>lastRead).length;
-       const badge=bell.querySelector('.sb-bell-count');
-       if(badge){badge.hidden=true;badge.textContent='';}
-       localStorage.setItem('sb-last-announcement',String(newest));
+     if(newest) {
+       try { localStorage.setItem('sb-last-announcement',String(newest)); }
+       catch { /* Reading still works if browser storage is disabled. */ }
      }
+     const badge=bell.querySelector('.sb-bell-count');
+     if(badge){badge.hidden=true;badge.textContent='';}
    }catch {
      items.replaceChildren(el('p','Aktuality se teď nepodařilo načíst. Zkus to později.','sb-notice-empty'));
    }
@@ -53,6 +52,24 @@
    backdrop.hidden=false;bell.setAttribute('aria-expanded','true');
    close.focus();void load();
  }
+ // Indicate announcements newer than the last viewed item without opening the popup.
+ async function checkUnread() {
+   const badge=bell.querySelector('.sb-bell-count');
+   if(!badge)return;
+   try{
+     const res=await fetch('/api/announcements',{cache:'no-store'});
+     if(!res.ok)return;
+     const data=await res.json();
+     if(!Array.isArray(data.announcements))return;
+     let lastRead=0;
+     try{lastRead=Number(localStorage.getItem('sb-last-announcement')||0);}
+     catch{ return; }
+     const unread=data.announcements.filter(item=>Number(item.id)>lastRead).length;
+     badge.hidden=unread===0;
+     badge.textContent=unread>9?'9+':String(unread);
+   }catch { /* An offline badge must not prevent opening the popup. */ }
+ }
+ void checkUnread();
  bell.addEventListener('click',show);
  close.addEventListener('click',hide);
  backdrop.addEventListener('click',ev=>{if(ev.target===backdrop)hide();});
