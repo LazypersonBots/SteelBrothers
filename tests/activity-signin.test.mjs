@@ -79,7 +79,12 @@ test('signin creates actual accounts only after server email proof', async () =>
   assert.match(page,/id="password"[^>]+type="password" required minlength="10"/);
   assert.match(page,/id="confirm-password"[^>]+required/);
   assert.match(page,/id="send-email-code"/);
-  assert.match(page,/id="email-opt-in"/);
+  assert.doesNotMatch(page,/id="email-opt-in"/);
+  assert.doesNotMatch(page,/id="notification-opt-in"/);
+  assert.match(page,/id="account-email-opt-in"/);
+  assert.match(page,/id="club-admin"[^>]*hidden/);
+  assert.match(page,/id="club-admin-compose"/);
+  assert.match(page,/src="\/club-admin\.js"/);
   assert.match(page,/id="account-summary"/);
   assert.doesNotMatch(page,/DEMO ÚČTY|účet nebude vytvořen/);
   assert.match(js,/\/api\/account\//);
@@ -100,11 +105,15 @@ test('announcement bell, accessible modal and admin-only composer appear on ever
     assert.match(page,/id="sb-bell"/);
     assert.match(page,/id="sb-notices"/);
     assert.match(page,/role="dialog"/);
-    assert.match(page,/id="sb-notice-compose"/);
+    assert.doesNotMatch(page,/id="sb-notice-compose"/);
+    assert.doesNotMatch(page,/id="sb-notice-send-email"/);
   }
   const js=await read('announcements.js');
   assert.match(js,/\/api\/announcements/);
-  assert.match(js,/me\.member\.isAdmin/);
+  const admin=await read('club-admin.js');
+  assert.match(admin,/member\?\.isAdmin===true/);
+  assert.match(admin,/\/api\/announcements/);
+  assert.doesNotMatch(js,/\/api\/account\/me/);
   assert.match(js,/textContent/);
   assert.doesNotMatch(js,/innerHTML/);
 });
@@ -159,7 +168,7 @@ test('Netlify and local preview serve both secondary pages', async () => {
     assert.ok(preview.includes("['/" + slug + "', '" + slug + "/index.html']"));
     assert.ok(build.includes("join(output, '" + slug + "')"));
   }
-  for (const name of ['activity.js','activity-data.json','signin.js','email-verification.js','auth.css','announcements.js','announcements.css','favicon.png']) {
+  for (const name of ['activity.js','activity-data.json','signin.js','email-verification.js','auth.css','announcements.js','announcements.css','club-admin.js','favicon.png']) {
     assert.ok(build.includes("'" + name + "'"));
   }
 });
