@@ -30,6 +30,7 @@ const routes = new Map([
   ['/signin.js', 'signin.js'],
   ['/email-verification.js', 'email-verification.js'],
   ['/announcements.js', 'announcements.js'],
+  ['/avatar-editor.js','avatar-editor.js'],
   ['/member-profile.js','member-profile.js'],
   ['/member-profile.css','member-profile.css'],
   ['/club-admin.js', 'club-admin.js'],
