@@ -57,7 +57,7 @@
  trigger.addEventListener('click',()=>popover.hidden?open():close());
  $('sb-profile-close').addEventListener('click',()=>{close();trigger.focus();});
  for(const button of popover.querySelectorAll('[data-panel]'))button.addEventListener('click',()=>tab(button.dataset.panel));
- document.addEventListener('pointerdown',ev=>{if(!popover.hidden&&!mount.contains(ev.target))close();});
+ document.addEventListener('pointerdown',ev=>{if(!popover.hidden&&!mount.contains(ev.target)&&!ev.target.closest?.('.sb-crop-overlay'))close();});
  document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&!popover.hidden){close();trigger.focus();}});
  $('sb-email-toggle').addEventListener('click',async()=>{
    if(busy||!member)return;busy=true;const next=!member.emailOptIn;
