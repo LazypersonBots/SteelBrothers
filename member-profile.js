@@ -82,13 +82,9 @@
      feedbackMessage('Vyber PNG, JPG nebo WebP do 5 MB.','error');ev.target.value='';return;
    }
    try{
-     const img=await loadImage(file),canvas=document.createElement('canvas');canvas.width=canvas.height=128;
-     const ctx=canvas.getContext('2d');if(!ctx)throw Error('Nelze zpracovat obrázek.');
-     const side=Math.min(img.naturalWidth,img.naturalHeight);
-     ctx.drawImage(img,(img.naturalWidth-side)/2,(img.naturalHeight-side)/2,side,side,0,0,128,128);
-     const data=canvas.toDataURL('image/webp',.7);
-     if(data.length>85000||!data.startsWith('data:image/webp;base64,'))throw Error('Obrázek je příliš velký.');
-     await setAvatar(data);
+     const img=await loadImage(file);
+     if(!window.SteelAvatarEditor)throw Error('Editor profilové fotky není dostupný. Obnov stránku.');
+     window.SteelAvatarEditor.open(img, data=>setAvatar(data));
    }catch(e){feedbackMessage(e.message,'error');}finally{ev.target.value='';}
  });
  $('sb-avatar-remove').addEventListener('click',async()=>{try{await setAvatar(null);}catch(e){feedbackMessage(e.message,'error');}});
