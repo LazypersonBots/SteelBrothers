@@ -13,6 +13,7 @@ const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const routes = new Map([
   ['/', 'index.html'], ['/index.html', 'index.html'],
   ['/announcements.js', 'announcements.js'], ['/announcements.css', 'announcements.css'],
+  ['/avatar-editor.js','avatar-editor.js'],
   ['/member-profile.js','member-profile.js'],['/member-profile.css','member-profile.css'],
   ['/club-admin.js', 'club-admin.js'],
   ['/history', 'history/index.html'], ['/history/', 'history/index.html'],
