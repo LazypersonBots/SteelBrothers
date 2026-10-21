@@ -44,14 +44,22 @@ test('Render route requires a fresh admin password and a permitted origin',async
    RENDER_EXTERNAL_URL:'https://steelbrothers.onrender.com',
    RESEND_API_KEY:'re_TEST',
    STEELBROTHERS_VERIFICATION_SECRET:'a-long-only-for-tests-signing-value-1234',
-   STEELBROTHERS_ADMIN_PASSWORD:'correct-admin-password-for-test'};
+   STEELBROTHERS_ADMIN_PASSWORD:'correct-admin-password-for-test',
+   SHOW_PASSWORD:'test-only-site-access-code-1234'};
  const server=createSteelBrothersServer({db,env});
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  try{
    const base='http://127.0.0.1:'+server.address().port;
+   const grant=await fetch(base+'/__site-access',{
+     method:'POST',redirect:'manual',
+     headers:{'Content-Type':'application/x-www-form-urlencoded'},
+     body:new URLSearchParams({password:env.SHOW_PASSWORD})
+   });
+   assert.equal(grant.status,303);
+   const accessCookie=grant.headers.get('set-cookie').split(';')[0];
    const send=(password,origin='https://steelbrothers.onrender.com')=>
      fetch(base+'/api/announcements/delete',{method:'POST',
-       headers:{'Content-Type':'application/json',Origin:origin,Cookie:'sb_session='+'A'.repeat(43)},
+       headers:{'Content-Type':'application/json',Origin:origin,Cookie:accessCookie+'; sb_session='+'A'.repeat(43)},
        body:JSON.stringify({id:'1',password})});
    assert.equal((await send('correct-admin-password-for-test','https://attacker.example')).status,403);
    assert.equal((await send('wrong-admin-password-for-test')).status,403);
