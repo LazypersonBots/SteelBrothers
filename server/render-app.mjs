@@ -8,6 +8,7 @@ import { createVerificationMemoryStore } from './render-memory-store.mjs';
 import { createClubService } from './club-service.mjs';
 import { ADMIN_EMAILS } from './club-db.mjs';
 import { createAdminAccess, clearAdminCookie, isVerifiedClubAdmin } from './admin-access.mjs';
+import { createSiteAccess } from './site-access.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const routes = new Map([
@@ -167,6 +168,13 @@ export function createSteelBrothersServer({
       if(!response.ok)throw Error('Club email provider error: '+response.status);
     }
   }):null;
+  const siteAccess=createSiteAccess({
+    password:env.SHOW_PASSWORD,
+    signingSecret:env.STEELBROTHERS_VERIFICATION_SECRET || '',
+    allowedOrigins,
+    rateLimit,
+    now
+  });
   const adminAccess=createAdminAccess({password:env.STEELBROTHERS_ADMIN_PASSWORD,secret:env.STEELBROTHERS_VERIFICATION_SECRET,now});
   const server=createServer(async (req, res) => {
     res.setHeader('X-Robots-Tag','noindex, nofollow, noimageindex, nosnippet');
@@ -183,6 +191,10 @@ export function createSteelBrothersServer({
       res.writeHead(200, {'Content-Type':'text/plain; charset=utf-8', 'Cache-Control':'no-store'});
       res.end('ok');return;
     }
+
+    // Every public page, asset and API route must pass this gate first.
+    // Only /health (above) and the gateway itself are reachable without a code.
+    if (await siteAccess.intercept(req, res, url)) return;
 
     if (url.pathname === '/api/email/send' || url.pathname === '/api/email/verify') {
       const isSend = url.pathname === '/api/email/send';
@@ -396,7 +408,7 @@ export function createSteelBrothersServer({
       const data = await readFile(target);
       res.writeHead(200, {
         'Content-Type':MIME.get(extname(target).toLowerCase()) || 'application/octet-stream',
-        'Cache-Control':'no-cache'
+        'Cache-Control':'private, no-store'
       });
       res.end(req.method === 'HEAD' ? undefined : data);
     } catch {
