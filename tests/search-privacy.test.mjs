@@ -54,19 +54,26 @@ test('Render returns noindex on HTML, photo, JSON and missing resources',async()
    await writeFile(join(root,'signin/index.html'),'<title>Sign in</title>');
    await writeFile(join(root,'robots.txt'),await read('robots.txt'));
    await writeFile(join(root,'photos/test.webp'),Buffer.from('fake image for header test'));
-   const app=createSteelBrothersServer({env:{},staticRoot:root});
+   const app=createSteelBrothersServer({env:{SHOW_PASSWORD:'test-only-site-access-code-1234'},staticRoot:root});
    await new Promise(resolve=>app.listen(0,'127.0.0.1',resolve));
    try{
      const base='http://127.0.0.1:'+app.address().port;
+     const grant=await fetch(base+'/__site-access',{
+       method:'POST',redirect:'manual',
+       headers:{'Content-Type':'application/x-www-form-urlencoded'},
+       body:new URLSearchParams({password:'test-only-site-access-code-1234'})
+     });
+     assert.equal(grant.status,303);
+     const cookie=grant.headers.get('set-cookie').split(';')[0];
      for(const path of ['/','/index.html','/gallery/','/activity/','/signin/',
        '/photos/test.webp','/api/account/status','/robots.txt','/nonexistent']){
-       const response=await fetch(base+path);
+       const response=await fetch(base+path,{headers:{Cookie:cookie}});
        const header=response.headers.get('x-robots-tag')||'';
        assert.match(header,/noindex/,path);
        assert.match(header,/nofollow/,path);
        assert.match(header,/noimageindex/,path);
      }
-     const robots=await fetch(base+'/robots.txt');
+     const robots=await fetch(base+'/robots.txt',{headers:{Cookie:cookie}});
      assert.equal(robots.status,200);
      assert.match(robots.headers.get('content-type')||'',/text\/plain/);
      assert.match(await robots.text(),/Googlebot-Image/);
