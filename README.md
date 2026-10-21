@@ -114,6 +114,34 @@ The build copies all site pages and gallery photos into `dist/`. The Node
 server serves static pages and handles `/api/email/send` and
 `/api/email/verify` using the existing Resend templates.
 
+## Private website access (Render)
+
+The Render server requires a shared website access code **before** serving the home
+page, any other page, images, scripts, gallery files, or account/API routes.
+The only exceptions are the access-code form and `/health` (for Render uptime checks).
+This is independent from individual member sign-in and the admin password.
+
+1. In Render, open the **SteelBrothers** web service → **Environment**.
+2. Add a secret environment variable named **`SHOW_PASSWORD`** and set its value
+   to the code visitors must enter. Use a strong, unique code; **never put its
+   actual value in this repository**.
+3. Save the environment setting, then deploy from Render when ready.
+
+- Without `SHOW_PASSWORD`, the server denies site content with **503** rather
+  than accidentally showing everything publicly.
+- Visitors are directed to a Czech/English unlock page. Correct entry creates
+  a 12-hour, secure, HttpOnly, SameSite cookie valid across the site.
+- Changing `SHOW_PASSWORD` invalidates previous access cookies.
+- Incorrect entries are rate-limited (8 tries per IP in 15 minutes).
+- `POST /__site-access/logout` clears the access cookie.
+- Code validation happens server-side. Frontend JavaScript cannot bypass it.
+- This gate protects only the **Render Node service**; publishing the raw
+  static output from `dist/` on a different public host would bypass it.
+- The repository and checked-in images are public on GitHub; this controls
+  website access, **not source-code privacy**.
+- Set Render **Settings → Auto-Deploy: Off** if you intend to deploy only
+  manually; on this service, commits to `main` otherwise trigger Render.
+
 Render service environment variables (create under Environment):
 
 - `RESEND_API_KEY`: SteelBrothers Resend account sending key.
