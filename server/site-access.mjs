@@ -1,7 +1,7 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
-const COOKIE = 'sb_show_access_v2';
-const SESSION_MS = 12 * 60 * 60 * 1000;
+const COOKIE = 'sb_show_access_v3';
+const SESSION_MS = 20 * 60 * 1000;
 const MAX_BODY_BYTES = 4096;
 
 const htmlEscape = value => String(value).replace(/[&<>"']/g, char => ({
@@ -45,7 +45,7 @@ export function createSiteAccess({ password, now = Date.now, rateLimit, signingS
   const configured = typeof password === 'string' && password.trim().length > 0;
   const digest = configured ? createHash('sha256').update(password).digest() : null;
   // Bind sessions to SHOW_PASSWORD so changing the code revokes existing access.
-  const key = configured ? createHash('sha256').update('steel-brothers-site-access-v2\0')
+  const key = configured ? createHash('sha256').update('steel-brothers-site-access-v3\0')
     .update(password).update('\0').update(signingSecret).digest() : null;
   const mac = value => createHmac('sha256', key).update(value).digest('hex');
   const write = (res, status, body, type = 'text/html; charset=utf-8', headers = {}, head = false) => {
@@ -62,7 +62,7 @@ export function createSiteAccess({ password, now = Date.now, rateLimit, signingS
     ...headers
   });
   const cookie = req => {
-    const match = /(?:^|;\s*)sb_show_access_v2=([A-Za-z0-9._-]+)(?:;|$)/.exec(req.headers.cookie || '');
+    const match = /(?:^|;\s*)sb_show_access_v3=([A-Za-z0-9._-]+)(?:;|$)/.exec(req.headers.cookie || '');
     return match?.[1] || '';
   };
   const authorized = req => {

@@ -131,7 +131,7 @@ This is independent from individual member sign-in and the admin password.
   than accidentally showing everything publicly.
 - Visitors are directed to a Czech/English unlock page. Correct entry creates
   a secure, HttpOnly, SameSite browser-session cookie valid across the site
-  for no more than 12 hours. Previous persistent access cookies are invalidated
+  for a maximum of 20 minutes after unlocking. Previous longer-lived access cookies are invalidated
   on upgrade; closing the browser normally ends the session.
 - Changing `SHOW_PASSWORD` invalidates previous access cookies.
 - Incorrect entries are rate-limited (8 tries per IP in 15 minutes).

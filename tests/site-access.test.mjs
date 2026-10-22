@@ -63,7 +63,7 @@ test('valid code unlocks the intended URL using a secure, HttpOnly, expiring ses
     const result = await unlock(base,ACCESS_CODE,'/gallery/?photo=1');
     assert.equal(result.status,303);
     assert.equal(result.headers.get('location'),'/gallery/?photo=1');
-    assert.match(result.headers.get('set-cookie'),/sb_show_access_v2=.*HttpOnly; Secure; SameSite=Lax/);
+    assert.match(result.headers.get('set-cookie'),/sb_show_access_v3=.*HttpOnly; Secure; SameSite=Lax/);
     assert.doesNotMatch(result.headers.get('set-cookie'),/Max-Age|Expires=/);
     const cookie = result.headers.get('set-cookie').split(';')[0];
     assert.equal((await (await fetch(base+'/gallery/',{headers:{Cookie:cookie}})).text()),'PRIVATE /gallery/');
@@ -81,19 +81,25 @@ test('valid code unlocks the intended URL using a secure, HttpOnly, expiring ses
   });
 });
 
-test('previous 12-hour persistent cookies are invalidated after the session-only upgrade', async () => {
+test('previous 12-hour access cookies cannot bypass the new 20-minute limit', async () => {
   const signingSecret = 'test-signing-secret';
   const password = ACCESS_CODE;
-  const previousKey = createHash('sha256').update('steel-brothers-site-access-v1\0')
-    .update(password).update('\0').update(signingSecret).digest();
-  const expiry = Date.now() + 30_000;
+  const expiry = Date.now() + 12 * 60 * 60 * 1000;
   const value = expiry+'.'+'a'.repeat(32);
-  const signature = createHmac('sha256', previousKey).update(value).digest('hex');
-  const oldCookie = 'sb_show_access='+value+'.'+signature;
   await withGate({password,signingSecret},async base=>{
-    const response=await fetch(base+'/',{...noRedirect,headers:{Cookie:oldCookie}});
-    assert.equal(response.status,303);
-    assert.match(response.headers.get('location'),/^\/__site-access/);
+    for (const [version, cookieName] of [
+      ['v1', 'sb_show_access'],
+      ['v2', 'sb_show_access_v2']
+    ]) {
+      const previousKey = createHash('sha256')
+        .update('steel-brothers-site-access-'+version+'\0')
+        .update(password).update('\0').update(signingSecret).digest();
+      const signature = createHmac('sha256', previousKey).update(value).digest('hex');
+      const oldCookie = cookieName+'='+value+'.'+signature;
+      const response = await fetch(base+'/',{...noRedirect,headers:{Cookie:oldCookie}});
+      assert.equal(response.status,303, version);
+      assert.match(response.headers.get('location'),/^\/__site-access/);
+    }
   });
 });
 
@@ -108,8 +114,12 @@ test('missing code fails closed, changed code and expiration revoke previous coo
   await withGate({password:ACCESS_CODE, now:()=>time}, async base => {
     issued = (await unlock(base)).headers.get('set-cookie').split(';')[0];
     assert.equal((await fetch(base+'/',{headers:{Cookie:issued},...noRedirect})).status,200);
-    time += 12*60*60*1000+1;
+    // Cookie never extends its own expiry on page visits.
+    time += 20 * 60 * 1000 - 1;
+    assert.equal((await fetch(base+'/',{headers:{Cookie:issued},...noRedirect})).status,200);
+    time += 1;
     assert.equal((await fetch(base+'/',{headers:{Cookie:issued},...noRedirect})).status,303);
+    assert.equal((await fetch(base+'/__site-access',{headers:{Cookie:issued},...noRedirect})).status,200);
   });
   await withGate({password:'changed-code'}, async base => {
     assert.equal((await fetch(base+'/',{headers:{Cookie:issued},...noRedirect})).status,303);
@@ -157,7 +167,7 @@ test('unlocks directly from HTTPS custom domains even if a proxy rewrites Host o
     const direct = await submit(preview,'https://'+preview,'same-origin');
     assert.equal(direct.status,303);
     assert.equal(direct.location,'/gallery/');
-    assert.ok(direct.cookie?.[0]?.includes('sb_show_access_v2='));
+    assert.ok(direct.cookie?.[0]?.includes('sb_show_access_v3='));
 
     const proxied = await submit('internal-render.example', 'https://steelbrothers.cz', 'same-origin');
     assert.equal(proxied.status,303);
