@@ -18,21 +18,6 @@ function safeNext(value) {
   } catch { return '/'; }
 }
 
-// Accept the site's own HTTPS hostname (including Render preview aliases),
-// even when RENDER_EXTERNAL_URL is missing or different from the URL in use.
-// A foreign Origin must still be blocked to prevent cross-site form submissions.
-function isAllowedOrigin(req, origin, allowedOrigins) {
-  if (allowedOrigins.includes(origin)) return true;
-  try {
-    const parsed = new URL(origin);
-    const host = String(req.headers.host || '').trim().toLowerCase();
-    const trustedHost = host === 'steelbrothers.cz' ||
-      host === 'www.steelbrothers.cz' || /^[a-z0-9-]+\.onrender\.com$/.test(host);
-    return trustedHost && parsed.protocol === 'https:' &&
-      parsed.origin === origin && parsed.host === host;
-  } catch { return false; }
-}
-
 function page(next, message = '') {
   return `<!doctype html>
 <html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -56,7 +41,7 @@ ${message ? `<div class="error" role="alert">${htmlEscape(message)}</div>` : ''}
 </main></body></html>`;
 }
 
-export function createSiteAccess({ password, now = Date.now, rateLimit, allowedOrigins = [], signingSecret = '' } = {}) {
+export function createSiteAccess({ password, now = Date.now, rateLimit, signingSecret = '' } = {}) {
   const configured = typeof password === 'string' && password.trim().length > 0;
   const digest = configured ? createHash('sha256').update(password).digest() : null;
   // Bind sessions to SHOW_PASSWORD so changing the code revokes existing access.
@@ -121,9 +106,11 @@ export function createSiteAccess({ password, now = Date.now, rateLimit, allowedO
         write(res, 405, 'Method not allowed', 'text/plain; charset=utf-8', {Allow:'GET, HEAD, POST'});
         return true;
       }
-      const origin = req.headers.origin;
-      if (origin && !isAllowedOrigin(req, origin, allowedOrigins)) {
-        write(res, 403, page(next, 'Přístup byl zablokován. Otevři web přes HTTPS. / Request blocked. Open the site over HTTPS.'));
+      // Browsers mark genuine cross-site form posts; do not compare Origin
+      // with proxy Host, which can differ for valid Render/custom-domain traffic.
+      // The shared password, rate limiter and signed session are authoritative.
+      if (req.headers['sec-fetch-site'] === 'cross-site') {
+        write(res, 403, page(next, 'Požadavek přišel z jiného webu. Otevři Steel Brothers přímo. / Open Steel Brothers directly to unlock.'));
         return true;
       }
       if (!/^application\/x-www-form-urlencoded(?:\s*;|\s*$)/i.test(req.headers['content-type'] || '')) {

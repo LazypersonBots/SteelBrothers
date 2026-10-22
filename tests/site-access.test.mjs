@@ -108,26 +108,47 @@ test('prevents open redirects, reflected HTML, cross-origin submissions and brut
   });
 });
 
-test('accepts same-site Render hostname while rejecting cross-site form submissions', async () => {
+test('unlocks directly from HTTPS custom domains even if a proxy rewrites Host or Origin', async () => {
   await withGate({password:ACCESS_CODE, allowedOrigins:['https://steelbrothers.cz']}, async base => {
-    const submit = (host, origin) => new Promise((resolve, reject) => {
+    const submit = (host, origin, fetchSite) => new Promise((resolve, reject) => {
       const destination = new URL(base);
-      const form = new URLSearchParams({password:ACCESS_CODE, next:'/' }).toString();
+      const form = new URLSearchParams({password:ACCESS_CODE, next:'/gallery/' }).toString();
+      const headers = {
+        Host:host, Origin:origin,
+        'Content-Type':'application/x-www-form-urlencoded',
+        ...(fetchSite ? {'Sec-Fetch-Site':fetchSite} : {})
+      };
       const req = httpRequest({
         hostname:destination.hostname, port:destination.port, path:'/__site-access', method:'POST',
-        headers:{Host:host, Origin:origin, 'Content-Type':'application/x-www-form-urlencoded'}
+        headers
       }, response => {
         response.resume();
-        response.on('end', () => resolve({status:response.statusCode, location:response.headers.location}));
+        response.on('end', () => resolve({
+          status:response.statusCode, location:response.headers.location,
+          cookie:response.headers['set-cookie']
+        }));
       });
       req.on('error',reject);
       req.end(form);
     });
     const preview='steelbrothers-preview.onrender.com';
-    assert.deepEqual(await submit(preview,'https://'+preview),{status:303,location:'/'});
-    assert.equal((await submit(preview,'https://other.onrender.com')).status,403);
-    assert.equal((await submit(preview,'https://attacker.example')).status,403);
-    assert.equal((await submit('attacker.example','https://attacker.example')).status,403);
-    assert.equal((await submit(preview,'http://'+preview)).status,403);
+    const direct = await submit(preview,'https://'+preview,'same-origin');
+    assert.equal(direct.status,303);
+    assert.equal(direct.location,'/gallery/');
+    assert.ok(direct.cookie?.[0]?.includes('sb_show_access='));
+
+    const proxied = await submit('internal-render.example', 'https://steelbrothers.cz', 'same-origin');
+    assert.equal(proxied.status,303);
+    assert.equal(proxied.location,'/gallery/');
+
+    const alternate = await submit('unlisted-custom-domain.example','https://unlisted-custom-domain.example');
+    assert.equal(alternate.status,303);
+
+    const originNull = await submit('internal-render.example','null','same-origin');
+    assert.equal(originNull.status,303);
+
+    const blocked = await submit(preview,'https://attacker.example','cross-site');
+    assert.equal(blocked.status,403);
+    assert.equal(blocked.cookie,undefined);
   });
 });
