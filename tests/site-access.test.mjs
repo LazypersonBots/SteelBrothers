@@ -70,7 +70,7 @@ test('valid code unlocks the intended URL using a secure, HttpOnly, expiring ses
     // A separate browser without the signed cookie must still enter the code.
     const freshBrowser = await fetch(base+'/gallery/',noRedirect);
     assert.equal(freshBrowser.status,303);
-    assert.match(freshBrowser.headers.get('location'),/^\\/__site-access/);
+    assert.match(freshBrowser.headers.get('location'),/^\/__site-access/);
     assert.equal((await (await fetch(base+'/api/account/me',{headers:{Cookie:cookie}})).text()),'PRIVATE /api/account/me');
     assert.equal((await fetch(base+'/',{headers:{Cookie:cookie}})).headers.get('vary'),'Cookie');
     const tampered = cookie.replace(/.$/,'z');
