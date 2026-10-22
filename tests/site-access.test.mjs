@@ -100,7 +100,7 @@ test('prevents open redirects, reflected HTML, cross-origin submissions and brut
     assert.equal((await unlock(base,ACCESS_CODE,'/\\attacker.example')).headers.get('location'),'/');
     const page = await (await fetch(base+'/__site-access?next=%22%3E%3Cscript%3E')).text();
     assert.doesNotMatch(page,/<script>/);
-    assert.equal((await unlock(base,ACCESS_CODE,'/',{headers:{Origin:'https://attacker.example'}})).status,403);
+    assert.equal((await unlock(base,ACCESS_CODE,'/',{headers:{Origin:'https://attacker.example','Sec-Fetch-Site':'cross-site'}})).status,403);
     for(let i=0;i<6;i++) await unlock(base,'bad');
     const limited=await unlock(base,'bad');
     assert.equal(limited.status,429);
