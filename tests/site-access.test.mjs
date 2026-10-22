@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createServer } from 'node:http';
+import { createServer, request as httpRequest } from 'node:http';
 import { createSiteAccess } from '../server/site-access.mjs';
 
 const ACCESS_CODE = 'long-private-website-code-for-tests';
@@ -105,5 +105,29 @@ test('prevents open redirects, reflected HTML, cross-origin submissions and brut
     const limited=await unlock(base,'bad');
     assert.equal(limited.status,429);
     assert.equal(limited.headers.get('retry-after'),'900');
+  });
+});
+
+test('accepts same-site Render hostname while rejecting cross-site form submissions', async () => {
+  await withGate({password:ACCESS_CODE, allowedOrigins:['https://steelbrothers.cz']}, async base => {
+    const submit = (host, origin) => new Promise((resolve, reject) => {
+      const destination = new URL(base);
+      const form = new URLSearchParams({password:ACCESS_CODE, next:'/' }).toString();
+      const req = httpRequest({
+        hostname:destination.hostname, port:destination.port, path:'/__site-access', method:'POST',
+        headers:{Host:host, Origin:origin, 'Content-Type':'application/x-www-form-urlencoded'}
+      }, response => {
+        response.resume();
+        response.on('end', () => resolve({status:response.statusCode, location:response.headers.location}));
+      });
+      req.on('error',reject);
+      req.end(form);
+    });
+    const preview='steelbrothers-preview.onrender.com';
+    assert.deepEqual(await submit(preview,'https://'+preview),{status:303,location:'/'});
+    assert.equal((await submit(preview,'https://other.onrender.com')).status,403);
+    assert.equal((await submit(preview,'https://attacker.example')).status,403);
+    assert.equal((await submit('attacker.example','https://attacker.example')).status,403);
+    assert.equal((await submit(preview,'http://'+preview)).status,403);
   });
 });

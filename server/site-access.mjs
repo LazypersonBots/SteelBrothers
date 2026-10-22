@@ -18,6 +18,21 @@ function safeNext(value) {
   } catch { return '/'; }
 }
 
+// Accept the site's own HTTPS hostname (including Render preview aliases),
+// even when RENDER_EXTERNAL_URL is missing or different from the URL in use.
+// A foreign Origin must still be blocked to prevent cross-site form submissions.
+function isAllowedOrigin(req, origin, allowedOrigins) {
+  if (allowedOrigins.includes(origin)) return true;
+  try {
+    const parsed = new URL(origin);
+    const host = String(req.headers.host || '').trim().toLowerCase();
+    const trustedHost = host === 'steelbrothers.cz' ||
+      host === 'www.steelbrothers.cz' || /^[a-z0-9-]+\.onrender\.com$/.test(host);
+    return trustedHost && parsed.protocol === 'https:' &&
+      parsed.origin === origin && parsed.host === host;
+  } catch { return false; }
+}
+
 function page(next, message = '') {
   return `<!doctype html>
 <html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -107,8 +122,8 @@ export function createSiteAccess({ password, now = Date.now, rateLimit, allowedO
         return true;
       }
       const origin = req.headers.origin;
-      if (origin && !allowedOrigins.includes(origin)) {
-        write(res, 403, 'Forbidden', 'text/plain; charset=utf-8');
+      if (origin && !isAllowedOrigin(req, origin, allowedOrigins)) {
+        write(res, 403, page(next, 'Přístup byl zablokován. Otevři web přes HTTPS. / Request blocked. Open the site over HTTPS.'));
         return true;
       }
       if (!/^application\/x-www-form-urlencoded(?:\s*;|\s*$)/i.test(req.headers['content-type'] || '')) {
