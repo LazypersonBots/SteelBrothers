@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer, request as httpRequest } from 'node:http';
+import { createHash, createHmac } from 'node:crypto';
 import { createSiteAccess } from '../server/site-access.mjs';
 
 const ACCESS_CODE = 'long-private-website-code-for-tests';
@@ -62,9 +63,14 @@ test('valid code unlocks the intended URL using a secure, HttpOnly, expiring ses
     const result = await unlock(base,ACCESS_CODE,'/gallery/?photo=1');
     assert.equal(result.status,303);
     assert.equal(result.headers.get('location'),'/gallery/?photo=1');
-    assert.match(result.headers.get('set-cookie'),/HttpOnly; Secure; SameSite=Lax; Max-Age=43200/);
+    assert.match(result.headers.get('set-cookie'),/sb_show_access_v2=.*HttpOnly; Secure; SameSite=Lax/);
+    assert.doesNotMatch(result.headers.get('set-cookie'),/Max-Age|Expires=/);
     const cookie = result.headers.get('set-cookie').split(';')[0];
     assert.equal((await (await fetch(base+'/gallery/',{headers:{Cookie:cookie}})).text()),'PRIVATE /gallery/');
+    // A separate browser without the signed cookie must still enter the code.
+    const freshBrowser = await fetch(base+'/gallery/',noRedirect);
+    assert.equal(freshBrowser.status,303);
+    assert.match(freshBrowser.headers.get('location'),/^\\/__site-access/);
     assert.equal((await (await fetch(base+'/api/account/me',{headers:{Cookie:cookie}})).text()),'PRIVATE /api/account/me');
     assert.equal((await fetch(base+'/',{headers:{Cookie:cookie}})).headers.get('vary'),'Cookie');
     const tampered = cookie.replace(/.$/,'z');
@@ -72,6 +78,22 @@ test('valid code unlocks the intended URL using a secure, HttpOnly, expiring ses
     const logout = await fetch(base+'/__site-access/logout',{method:'POST',redirect:'manual',headers:{Cookie:cookie}});
     assert.equal(logout.status,303);
     assert.match(logout.headers.get('set-cookie'),/Max-Age=0/);
+  });
+});
+
+test('previous 12-hour persistent cookies are invalidated after the session-only upgrade', async () => {
+  const signingSecret = 'test-signing-secret';
+  const password = ACCESS_CODE;
+  const previousKey = createHash('sha256').update('steel-brothers-site-access-v1\0')
+    .update(password).update('\0').update(signingSecret).digest();
+  const expiry = Date.now() + 30_000;
+  const value = expiry+'.'+'a'.repeat(32);
+  const signature = createHmac('sha256', previousKey).update(value).digest('hex');
+  const oldCookie = 'sb_show_access='+value+'.'+signature;
+  await withGate({password,signingSecret},async base=>{
+    const response=await fetch(base+'/',{...noRedirect,headers:{Cookie:oldCookie}});
+    assert.equal(response.status,303);
+    assert.match(response.headers.get('location'),/^\/__site-access/);
   });
 });
 
@@ -135,7 +157,7 @@ test('unlocks directly from HTTPS custom domains even if a proxy rewrites Host o
     const direct = await submit(preview,'https://'+preview,'same-origin');
     assert.equal(direct.status,303);
     assert.equal(direct.location,'/gallery/');
-    assert.ok(direct.cookie?.[0]?.includes('sb_show_access='));
+    assert.ok(direct.cookie?.[0]?.includes('sb_show_access_v2='));
 
     const proxied = await submit('internal-render.example', 'https://steelbrothers.cz', 'same-origin');
     assert.equal(proxied.status,303);

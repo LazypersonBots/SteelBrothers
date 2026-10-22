@@ -130,7 +130,9 @@ This is independent from individual member sign-in and the admin password.
 - Without `SHOW_PASSWORD`, the server denies site content with **503** rather
   than accidentally showing everything publicly.
 - Visitors are directed to a Czech/English unlock page. Correct entry creates
-  a 12-hour, secure, HttpOnly, SameSite cookie valid across the site.
+  a secure, HttpOnly, SameSite browser-session cookie valid across the site
+  for no more than 12 hours. Previous persistent access cookies are invalidated
+  on upgrade; closing the browser normally ends the session.
 - Changing `SHOW_PASSWORD` invalidates previous access cookies.
 - Incorrect entries are rate-limited (8 tries per IP in 15 minutes).
 - `POST /__site-access/logout` clears the access cookie.
